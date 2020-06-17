@@ -1,13 +1,13 @@
 {
   "name": "generator-jhipster-preauthorize",
   "version": "0.0.0",
-  "description": "Adds PreAuthorize to each end point for each entity",
+  "description": "Adds PreAuthorize to each endpoint for each entity",
   "keywords": [
     "yeoman-generator",
     "jhipster-blueprint",
     "jhipster-5"
   ],
-  "homepage": "https://github.com/yelhouti/generator-jhipster-preauthorize",
+  "homepage": "https://github.com/elhoutico/generator-jhipster-preauthorize",
   "author": {
     "name": "Youssef El Houti",
     "email": "youssef.elhouti@elhouti.com",
@@ -19,11 +19,12 @@
   "main": "generators/app/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yelhouti/generator-jhipster-preauthorize.git"
+    "url": "git+https://github.com/elhoutico/generator-jhipster-preauthorize.git"
   },
   "dependencies": {
     "chalk": "2.4.1",
-    "generator-jhipster": "6.9.1"
+    "generator-jhipster": "6.8.0",
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
     "chai": "4.1.2",
@@ -55,6 +56,6 @@
   },
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/yelhouti/generator-jhipster-preauthorize/issues"
+    "url": "https://github.com/elhoutico/generator-jhipster-preauthorize/issues"
   }
 }

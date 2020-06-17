@@ -1,6 +1,10 @@
 /* eslint-disable consistent-return */
 const chalk = require('chalk');
+const _ = require('lodash');
 const EntityServerGenerator = require('generator-jhipster/generators/entity-server');
+const constants = require('generator-jhipster/generators/generator-constants');
+
+const SERVER_MAIN_SRC_DIR = constants.SERVER_MAIN_SRC_DIR;
 
 module.exports = class extends EntityServerGenerator {
     constructor(args, opts) {
@@ -68,8 +72,22 @@ module.exports = class extends EntityServerGenerator {
     }
 
     get writing() {
-        // Here we are not overriding this phase and hence its being handled by JHipster
-        return super._writing();
+        const customPostPhaseSteps = {
+            addPreAuthorizeAnnotationsAndAuthorities() {
+                const fileName = `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/web/rest/${this.entityClass}Resource.java`;
+                const entityNameUpperCase = _.snakeCase(this.name).toUpperCase();
+                this.fs.append(fileName, `// ${entityNameUpperCase}_DELETE`);
+            }
+        };
+        // TODO check if another EntityServerGenerator Blueprint exist to know if we should return only our custom function or prepend it with super._writing();
+        const otherBlueprintPresent = false;
+        if (!otherBlueprintPresent) {
+            return {
+                ...super._writing(),
+                ...customPostPhaseSteps
+            };
+        }
+        return customPostPhaseSteps;
     }
 
     get install() {
