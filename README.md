@@ -95,7 +95,7 @@ Apache-2.0 © [Youssef El Houti](https://elhouti.com)
 
 [npm-image]: https://img.shields.io/npm/v/generator-jhipster-preauthorize.svg
 [npm-url]: https://npmjs.org/package/generator-jhipster-preauthorize
-[travis-image]: https://travis-ci.org/yelhouti/generator-jhipster-preauthorize.svg?branch=master
-[travis-url]: https://travis-ci.org/yelhouti/generator-jhipster-preauthorize
-[daviddm-image]: https://david-dm.org/yelhouti/generator-jhipster-preauthorize.svg?theme=shields.io
-[daviddm-url]: https://david-dm.org/yelhouti/generator-jhipster-preauthorize
+[travis-image]: https://travis-ci.org/elhoutico/generator-jhipster-preauthorize.svg?branch=master
+[travis-url]: https://travis-ci.org/elhoutico/generator-jhipster-preauthorize
+[daviddm-image]: https://david-dm.org/elhoutico/generator-jhipster-preauthorize.svg?theme=shields.io
+[daviddm-url]: https://david-dm.org/elhoutico/generator-jhipster-preauthorize
