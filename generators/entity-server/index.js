@@ -73,10 +73,89 @@ module.exports = class extends EntityServerGenerator {
 
     get writing() {
         const customPostPhaseSteps = {
-            addPreAuthorizeAnnotationsAndAuthorities() {
+            addPreAuthorizeAnnotationsAndImports() {
                 const fileName = `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/web/rest/${this.entityClass}Resource.java`;
                 const entityNameUpperCase = _.snakeCase(this.name).toUpperCase();
-                this.fs.append(fileName, `// ${entityNameUpperCase}_DELETE`);
+                // this.fs.append(fileName, `// ${entityNameUpperCase}_DELETE`);
+                let result = this.fs.read(fileName);
+                // add imports
+                result = result.replace(
+                    'import org.springframework.http.ResponseEntity;',
+                    `import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;`
+                );
+                result = result.replace(
+                    `/**
+ * REST controller`,
+                    `import static ${this.packageName}.security.AuthoritiesConstants.*;
+
+/**
+ * REST controller`
+                );
+                // add preAuthorize annotations
+                result = result.replace(/(@GetMapping.+)/g, `$1\n    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_READ + "')")`);
+                result = result.replace(
+                    /(@DeleteMapping.+)/g,
+                    `$1\n    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_DELETE + "')")`
+                );
+                result = result.replace(
+                    /(@PostMapping.+)/g,
+                    `$1\n    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_CREATE + "')")`
+                );
+                result = result.replace(
+                    /(@PutMapping.+)/g,
+                    `$1\n    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_UPDATE + "')")`
+                );
+                this.fs.write(fileName, result);
+            },
+
+            addAuthoritiesConstant() {
+                const fileName = `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/security/AuthoritiesConstants.java`;
+                let result = this.fs.read(fileName);
+                const entityNameUpperCase = _.snakeCase(this.name).toUpperCase();
+                const entityKebabCase = _.kebabCase(this.name);
+                const treeInit = `
+        new AbstractMap.SimpleEntry<>(${entityNameUpperCase}_CREATE, new ArrayList<String>()),
+        new AbstractMap.SimpleEntry<>(${entityNameUpperCase}_READ, new ArrayList<String>()),
+        new AbstractMap.SimpleEntry<>(${entityNameUpperCase}_UPDATE, new ArrayList<String>()),
+        new AbstractMap.SimpleEntry<>(${entityNameUpperCase}_DELETE, new ArrayList<String>())`;
+                if (result.indexOf('AUTHORITIES_TREE') === -1) {
+                    result = result.replace(
+                        `${this.packageName}.security;`,
+                        `${this.packageName}.security;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;`
+                    );
+                    result = result.replace(
+                        'private AuthoritiesConstants()',
+                        `public static final Map<String, List<String>> AUTHORITIES_TREE = Stream.of(${treeInit}
+    ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+    private AuthoritiesConstants()`
+                    );
+                } else {
+                    result = result.replace(
+                        `)
+    ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));`,
+                        `),
+${treeInit}
+    ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));`
+                    );
+                }
+                const authorities = `public static final String ${entityNameUpperCase}_CREATE = "${entityKebabCase}+create";
+    public static final String ${entityNameUpperCase}_READ = "${entityKebabCase}+read";
+    public static final String ${entityNameUpperCase}_UPDATE = "${entityKebabCase}+update";
+    public static final String ${entityNameUpperCase}_DELETE = "${entityKebabCase}+delete";
+`;
+                result = result.replace(
+                    'public static final Map<String, List<String>> AUTHORITIES_TREE = Stream.of(',
+                    `${authorities}
+    public static final Map<String, List<String>> AUTHORITIES_TREE = Stream.of(`
+                );
+
+                this.fs.write(fileName, result);
             }
         };
         // TODO check if another EntityServerGenerator Blueprint exist to know if we should return only our custom function or prepend it with super._writing();
