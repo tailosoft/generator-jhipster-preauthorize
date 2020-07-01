@@ -1,6 +1,7 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.domain.User;
+import com.mycompany.myapp.repository.RoleAuthorityRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.MailService;
@@ -40,12 +41,15 @@ public class AccountResource {
 
     private final UserService userService;
 
+    private final RoleAuthorityRepository roleAuthorityRepository;
+
     private final MailService mailService;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    public AccountResource(UserRepository userRepository, UserService userService, RoleAuthorityRepository roleAuthorityRepository, MailService mailService) {
 
         this.userRepository = userRepository;
         this.userService = userService;
+        this.roleAuthorityRepository = roleAuthorityRepository;
         this.mailService = mailService;
     }
 
@@ -101,8 +105,12 @@ public class AccountResource {
      */
     @GetMapping("/account")
     public UserDTO getAccount() {
-        return userService.getUserWithAuthorities()
+        return userService.getUserWithRoles()
             .map(UserDTO::new)
+            .map(userDto -> {
+                userDto.setAuthorities(SecurityUtils.getCurrentAuthorities());
+                return userDto;
+            })
             .orElseThrow(() -> new AccountResourceException("User could not be found"));
     }
 

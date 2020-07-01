@@ -62,6 +62,9 @@ describe('Subgenerator entity-server of preauthorize JHipster blueprint', () => 
                     );
                 })
             );
+            // making sure file that should be created or renamed to are created, and files that should be renamed from or deleted are deleted
+            assert.file(path.join(testDir, 'src/main/java/com/mycompany/myapp/domain/Role.java'));
+            assert.noFile(path.join(testDir, 'src/main/java/com/mycompany/myapp/domain/Authority.java'));
         });
     });
 });

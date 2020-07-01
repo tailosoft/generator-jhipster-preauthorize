@@ -74,9 +74,8 @@ module.exports = class extends EntityServerGenerator {
     get writing() {
         const customPostPhaseSteps = {
             addPreAuthorizeAnnotationsAndImports() {
-                const fileName = `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/web/rest/${this.entityClass}Resource.java`;
                 const entityNameUpperCase = _.snakeCase(this.name).toUpperCase();
-                // this.fs.append(fileName, `// ${entityNameUpperCase}_DELETE`);
+                const fileName = `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/web/rest/${this.entityClass}Resource.java`;
                 let result = this.fs.read(fileName);
                 // add imports
                 result = result.replace(
@@ -93,20 +92,89 @@ import org.springframework.security.access.prepost.PreAuthorize;`
  * REST controller`
                 );
                 // add preAuthorize annotations
-                result = result.replace(/(@GetMapping.+)/g, `$1\n    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_READ + "')")`);
+                result = result.replace(
+                    /(@GetMapping.+)/g,
+                    `$1
+    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_READ + "')")`
+                );
                 result = result.replace(
                     /(@DeleteMapping.+)/g,
-                    `$1\n    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_DELETE + "')")`
+                    `$1
+    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_DELETE + "')")`
                 );
                 result = result.replace(
                     /(@PostMapping.+)/g,
-                    `$1\n    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_CREATE + "')")`
+                    `$1
+    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_CREATE + "')")`
                 );
                 result = result.replace(
                     /(@PutMapping.+)/g,
-                    `$1\n    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_UPDATE + "')")`
+                    `$1
+    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_UPDATE + "')")`
                 );
                 this.fs.write(fileName, result);
+
+                const fileNameIT = `src/test/java/${this.packageFolder}/web/rest/${this.entityClass}ResourceIT.java`;
+                let resultIT = this.fs.read(fileNameIT);
+                resultIT = resultIT.replace(/\n\s*\n\s*\n/g, '\n\n');
+                resultIT = resultIT.replace(
+                    `}
+                @Test`,
+                    `}
+
+    @Test`
+                );
+                resultIT = resultIT.replace(
+                    `}
+    
+    @Test`,
+                    `}
+
+    @Test`
+                );
+                resultIT = resultIT.replace('\t', '');
+                resultIT = resultIT.replace(/JhipsterBlueprintApp/g, 'PreauthorizeApp');
+                resultIT = resultIT.replace(
+                    `import ${this.packageName}.security.AuthoritiesConstants;`,
+                    `import ${this.packageName}.repository.RoleAuthorityRepository;
+import ${this.packageName}.security.AuthoritiesConstants;`
+                );
+                resultIT = resultIT.replace(
+                    `import ${this.packageName}.repository.${this.name}Repository;`,
+                    `import ${this.packageName}.repository.${this.name}Repository;
+import ${this.packageName}.security.AuthoritiesConstants;`
+                );
+                resultIT = resultIT.replace(
+                    'import javax.persistence.EntityManager;',
+                    `import javax.persistence.EntityManager;
+import ${this.packageName}.security.AuthoritiesConstants.*;`
+                );
+                resultIT = resultIT.replace(
+                    /(public void create.+)/g,
+                    `@WithMockUser(authorities = AuthoritiesConstants.${entityNameUpperCase}_CREATE )
+    $1`
+                );
+                resultIT = resultIT.replace(
+                    /(public void read.+)/g,
+                    `@WithMockUser(authorities = AuthoritiesConstants.${entityNameUpperCase}_READ )
+    $1`
+                );
+                resultIT = resultIT.replace(
+                    /(public void get.+)/g,
+                    `@WithMockUser(authorities = AuthoritiesConstants.${entityNameUpperCase}_READ )
+    $1`
+                );
+                resultIT = resultIT.replace(
+                    /(public void delete.+)/g,
+                    `@WithMockUser(authorities = AuthoritiesConstants.${entityNameUpperCase}_DELETE )
+    $1`
+                );
+                resultIT = resultIT.replace(
+                    /(public void update.+)/g,
+                    `@WithMockUser(authorities = AuthoritiesConstants.${entityNameUpperCase}_UPDATE )
+    $1`
+                );
+                this.fs.write(fileNameIT, resultIT);
             },
 
             addAuthoritiesConstant() {
@@ -119,31 +187,13 @@ import org.springframework.security.access.prepost.PreAuthorize;`
         new AbstractMap.SimpleEntry<>(${entityNameUpperCase}_READ, new ArrayList<String>()),
         new AbstractMap.SimpleEntry<>(${entityNameUpperCase}_UPDATE, new ArrayList<String>()),
         new AbstractMap.SimpleEntry<>(${entityNameUpperCase}_DELETE, new ArrayList<String>())`;
-                if (result.indexOf('AUTHORITIES_TREE') === -1) {
-                    result = result.replace(
-                        `${this.packageName}.security;`,
-                        `${this.packageName}.security;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;`
-                    );
-                    result = result.replace(
-                        'private AuthoritiesConstants()',
-                        `public static final Map<String, List<String>> AUTHORITIES_TREE = Stream.of(${treeInit}
-    ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-    private AuthoritiesConstants()`
-                    );
-                } else {
-                    result = result.replace(
-                        `)
+                result = result.replace(
+                    `)
     ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));`,
-                        `),
+                    `),
 ${treeInit}
     ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));`
-                    );
-                }
+                );
                 const authorities = `public static final String ${entityNameUpperCase}_CREATE = "${entityKebabCase}+create";
     public static final String ${entityNameUpperCase}_READ = "${entityKebabCase}+read";
     public static final String ${entityNameUpperCase}_UPDATE = "${entityKebabCase}+update";

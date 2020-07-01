@@ -15,6 +15,14 @@ public final class AuthoritiesConstants {
 
     public static final String ANONYMOUS = "ROLE_ANONYMOUS";
 
+    public static final String ROLE_CREATE = "role+create";
+    public static final String ROLE_READ = "role+read";
+    public static final String ROLE_UPDATE = "role+update";
+    public static final String ROLE_DELETE = "role+delete";
+
+    public static final String ROLE_AUTHORITY_READ = "role-authority+read";
+    public static final String ROLE_AUTHORITY_UPDATE = "role-authority+update";
+
     public static final String EMPLOYEE_CREATE = "employee+create";
     public static final String EMPLOYEE_READ = "employee+read";
     public static final String EMPLOYEE_UPDATE = "employee+update";
@@ -51,6 +59,14 @@ public final class AuthoritiesConstants {
     public static final String PRICE_FORMULA_DELETE = "price-formula+delete";
 
     public static final Map<String, List<String>> AUTHORITIES_TREE = Stream.of(
+        new AbstractMap.SimpleEntry<>(ROLE_CREATE, new ArrayList<String>()),
+        new AbstractMap.SimpleEntry<>(ROLE_READ, new ArrayList<String>()),
+        new AbstractMap.SimpleEntry<>(ROLE_UPDATE, new ArrayList<String>()),
+        new AbstractMap.SimpleEntry<>(ROLE_DELETE, new ArrayList<String>()),
+
+        new AbstractMap.SimpleEntry<>(ROLE_AUTHORITY_READ, new ArrayList<String>()),
+        new AbstractMap.SimpleEntry<>(ROLE_AUTHORITY_UPDATE, Arrays.asList(ROLE_READ)),
+
         new AbstractMap.SimpleEntry<>(EMPLOYEE_CREATE, new ArrayList<String>()),
         new AbstractMap.SimpleEntry<>(EMPLOYEE_READ, new ArrayList<String>()),
         new AbstractMap.SimpleEntry<>(EMPLOYEE_UPDATE, new ArrayList<String>()),
