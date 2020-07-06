@@ -116,62 +116,39 @@ import org.springframework.security.access.prepost.PreAuthorize;`
 
                 const fileNameIT = `src/test/java/${this.packageFolder}/web/rest/${this.entityClass}ResourceIT.java`;
                 let resultIT = this.fs.read(fileNameIT);
-                resultIT = resultIT.replace(/\n\s*\n\s*\n/g, '\n\n');
                 resultIT = resultIT.replace(
-                    `}
-                @Test`,
-                    `}
-
-    @Test`
+                    `@WithMockUser
+public class ${this.entityClass}ResourceIT {`,
+                    `public class ${this.entityClass}ResourceIT {`
                 );
                 resultIT = resultIT.replace(
-                    `}
-    
-    @Test`,
-                    `}
-
-    @Test`
-                );
-                resultIT = resultIT.replace('\t', '');
-                resultIT = resultIT.replace(/JhipsterBlueprintApp/g, 'PreauthorizeApp');
-                resultIT = resultIT.replace(
-                    `import ${this.packageName}.security.AuthoritiesConstants;`,
-                    `import ${this.packageName}.repository.RoleAuthorityRepository;
-import ${this.packageName}.security.AuthoritiesConstants;`
-                );
-                resultIT = resultIT.replace(
-                    `import ${this.packageName}.repository.${this.name}Repository;`,
-                    `import ${this.packageName}.repository.${this.name}Repository;
-import ${this.packageName}.security.AuthoritiesConstants;`
-                );
-                resultIT = resultIT.replace(
-                    'import javax.persistence.EntityManager;',
-                    `import javax.persistence.EntityManager;
-import ${this.packageName}.security.AuthoritiesConstants.*;`
+                    'import static org.assertj.core.api.Assertions.assertThat;',
+                    `import static ${this.packageName}.security.AuthoritiesConstants.*;
+import static org.assertj.core.api.Assertions.assertThat;`
                 );
                 resultIT = resultIT.replace(
                     /(public void create.+)/g,
-                    `@WithMockUser(authorities = AuthoritiesConstants.${entityNameUpperCase}_CREATE )
+                    `@WithMockUser(authorities = {${entityNameUpperCase}_CREATE})
     $1`
                 );
                 resultIT = resultIT.replace(
-                    /(public void read.+)/g,
-                    `@WithMockUser(authorities = AuthoritiesConstants.${entityNameUpperCase}_READ )
+                    /(public void check.+)/g,
+                    `@WithMockUser(authorities = {${entityNameUpperCase}_CREATE})
     $1`
                 );
                 resultIT = resultIT.replace(
                     /(public void get.+)/g,
-                    `@WithMockUser(authorities = AuthoritiesConstants.${entityNameUpperCase}_READ )
+                    `@WithMockUser(authorities = {${entityNameUpperCase}_READ})
     $1`
                 );
                 resultIT = resultIT.replace(
                     /(public void delete.+)/g,
-                    `@WithMockUser(authorities = AuthoritiesConstants.${entityNameUpperCase}_DELETE )
+                    `@WithMockUser(authorities = {${entityNameUpperCase}_DELETE})
     $1`
                 );
                 resultIT = resultIT.replace(
                     /(public void update.+)/g,
-                    `@WithMockUser(authorities = AuthoritiesConstants.${entityNameUpperCase}_UPDATE )
+                    `@WithMockUser(authorities = {${entityNameUpperCase}_UPDATE})
     $1`
                 );
                 this.fs.write(fileNameIT, resultIT);

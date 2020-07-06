@@ -1,7 +1,6 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.service.RoleAuthorityService;
-import com.mycompany.myapp.service.dto.RoleAuthorityDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +12,7 @@ import javax.validation.Valid;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.mycompany.myapp.security.AuthoritiesConstants.*;
 
@@ -48,13 +48,13 @@ public class RoleAuthorityResource {
     }
 
     /**
-     * {@code GET  /role-authorities/} : get all the roleAuthorities.
+     * {@code GET  /role-authorities/{roleName}} : get all the roleAuthorities.
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of roleAuthorities in body.
      */
     @GetMapping("/role-authorities/{roleName}")
     @PreAuthorize("hasAuthority('" + ROLE_AUTHORITY_READ + "')")
-    public List<RoleAuthorityDTO> getAllRoleAuthoritiesForRole(@PathVariable String roleName) {
+    public Set<String> getAllRoleAuthoritiesForRole(@PathVariable String roleName) {
         log.debug("REST request to get all RoleAuthorities");
         return roleAuthorityService.findByRoleName(roleName);
     }
@@ -64,4 +64,5 @@ public class RoleAuthorityResource {
     public Map<String, List<String>> getAuthoritiesDependencies() {
         return roleAuthorityService.getAuthoritiesDependencies();
     }
+    // /account allows a user it retreive it's info (username, roles, and all it's authorities)
 }

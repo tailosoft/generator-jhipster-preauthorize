@@ -86,18 +86,13 @@ module.exports = class extends ServerGenerator {
                 // override the writeServerFiles method from the _writing phase of JHipster
                 writeFiles().writeRoleAuthorityServerFiles.call(this);
             },
-            // grep -R 'Authorit'/ 'authorit' src/main/java/
-            // ${SERVER_MAIN_SRC_DIR}${this.packageFolder}/web/rest/AccountResource.java
-            // ${SERVER_MAIN_SRC_DIR}${this.packageFolder}/security/jwt/TokenProvider.java
-            // ${SERVER_MAIN_SRC_DIR}${this.packageFolder}/security/SecurityUtils.java
-            // ${SERVER_MAIN_SRC_DIR}${this.packageFolder}/service/dto/UserDTO.java
             changeAuthorityToRole() {
                 const filesNames = [
                     `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/domain/User.java`,
                     `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/domain/Authority.java`,
                     `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/web/rest/UserResource.java`,
                     `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/repository/UserRepository.java`,
-                    `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/security/jwt/TokenProvider.java`,
+                    // `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/security/jwt/TokenProvider.java`,
                     `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/security/DomainUserDetailsService.java`,
                     `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/service/mapper/UserMapper.java`,
                     `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/service/UserService.java`,
@@ -110,10 +105,11 @@ module.exports = class extends ServerGenerator {
                     `${SERVER_MAIN_RES_DIR}config/liquibase/changelog/00000000000000_initial_schema.xml`,
                     `${SERVER_MAIN_RES_DIR}config/liquibase/data/authority.csv`,
                     `${SERVER_MAIN_RES_DIR}config/liquibase/data/user_authority.csv`,
-                    `${SERVER_TEST_SRC_DIR}${this.packageFolder}/web/rest/AccountResourceIT.java`
+                    `${SERVER_TEST_SRC_DIR}${this.packageFolder}/web/rest/AccountResourceIT.java`,
+                    `${SERVER_TEST_SRC_DIR}${this.packageFolder}/web/rest/UserResourceIT.java`,
+                    `${SERVER_TEST_SRC_DIR}${this.packageFolder}/service/mapper/UserMapperTest.java`
                 ];
-                // eslint-disable-next-line no-restricted-syntax
-                for (const fileName of filesNames) {
+                filesNames.forEach(fileName => {
                     if (this.fs.exists(fileName)) {
                         const result = this._replaceAuthorityByRole(this.fs.read(fileName));
                         const newFileName = this._replaceAuthorityByRole(fileName);
@@ -122,7 +118,7 @@ module.exports = class extends ServerGenerator {
                             this.fs.delete(fileName);
                         }
                     }
-                }
+                });
                 const fileNameCacheConfig = `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/config/CacheConfiguration.java`;
                 let resultCacheConfig = this.fs.read(fileNameCacheConfig);
                 resultCacheConfig = resultCacheConfig.replace(
@@ -147,7 +143,6 @@ import java.util.stream.Stream;`
                     'private AuthoritiesConstants()',
                     `public static final String ROLE_CREATE = "role+create";
     public static final String ROLE_READ = "role+read";
-    public static final String ROLE_UPDATE = "role+update";
     public static final String ROLE_DELETE = "role+delete";
 
     public static final String ROLE_AUTHORITY_READ = "role-authority+read";
@@ -156,31 +151,25 @@ import java.util.stream.Stream;`
     public static final Map<String, List<String>> AUTHORITIES_TREE = Stream.of(
         new AbstractMap.SimpleEntry<>(ROLE_CREATE, new ArrayList<String>()),
         new AbstractMap.SimpleEntry<>(ROLE_READ, new ArrayList<String>()),
-        new AbstractMap.SimpleEntry<>(ROLE_UPDATE, new ArrayList<String>()),
         new AbstractMap.SimpleEntry<>(ROLE_DELETE, new ArrayList<String>()),
 
         new AbstractMap.SimpleEntry<>(ROLE_AUTHORITY_READ, new ArrayList<String>()),
-        new AbstractMap.SimpleEntry<>(ROLE_AUTHORITY_UPDATE, Arrays.asList(ROLE_READ))
+        new AbstractMap.SimpleEntry<>(ROLE_AUTHORITY_UPDATE, Arrays.asList(ROLE_AUTHORITY_READ))
     ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     private AuthoritiesConstants()`
                 );
                 this.fs.write(fileNameAuthoritiesConstants, resultAuthoritiesConstants);
 
-                /* ************ UserDTO.java ************ */
+                /* ************ UserDTO.java replace back ************ */
                 const fileNameUserDTO = `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/service/dto/UserDTO.java`;
                 // eslint-disable-next-line no-unused-vars
                 let resultUserDTO = this.fs.read(fileNameUserDTO);
                 resultUserDTO = resultUserDTO.replace(
-                    `import ${this.packageName}.domain.Role;`,
-                    `import ${this.packageName}.domain.Role;
-                    import ${this.packageName}.domain.Authority;`
-                );
-                resultUserDTO = resultUserDTO.replace(
                     'private Set<String> roles;',
                     `private Set<String> roles;
 
-private Set<String> authorities;`
+    private Set<String> authorities;`
                 );
                 resultUserDTO = resultUserDTO.replace(
                     `public void setRoles(Set<String> roles) {
@@ -202,7 +191,6 @@ private Set<String> authorities;`
 
                 /* ************ AccountResource.java ************ */
                 const fileNameAccountResource = `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/web/rest/AccountResource.java`;
-                // eslint-disable-next-line no-unused-vars
                 let resultAccountResource = this.fs.read(fileNameAccountResource);
                 // TODO add init roleAuthoritiesRepository
                 resultAccountResource = resultAccountResource.replace(
@@ -280,6 +268,9 @@ import java.util.stream.Stream;`
                 /* ************ TokenProvider.java ************ */
                 const tokenProviderFileName = `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/security/jwt/TokenProvider.java`;
                 let resultTokenProvider = this.fs.read(tokenProviderFileName);
+                resultTokenProvider = resultTokenProvider.replace(/\bauthorities\b/g, 'roles');
+                resultTokenProvider = resultTokenProvider.replace(/\bAUTHORITIES_KEY\b/g, 'ROLES_KEY');
+                resultTokenProvider = resultTokenProvider.replace('"auth"', '"roles"');
                 resultTokenProvider = resultTokenProvider.replace(
                     'import org.slf4j.Logger;',
                     `import com.google.common.collect.Streams;
@@ -287,10 +278,6 @@ import ${this.packageName}.repository.RoleAuthorityRepository;
 import ${this.packageName}.security.AuthoritiesConstants;
 import org.slf4j.Logger;`
                 );
-                resultTokenProvider = resultTokenProvider.replace('getRoles', 'getAuthorities');
-                resultTokenProvider = resultTokenProvider.replace('getRole', 'getAuthority');
-                resultTokenProvider = resultTokenProvider.replace('"auth"', '"roles"');
-                resultTokenProvider = resultTokenProvider.replace(/AUTHORITIES_KEY/g, 'ROLES_KEY');
                 resultTokenProvider = resultTokenProvider.replace(
                     `public TokenProvider(JHipsterProperties jHipsterProperties) {
         this.jHipsterProperties = jHipsterProperties;
@@ -308,28 +295,15 @@ import org.slf4j.Logger;`
             .filter(a -> a.startsWith("ROLE_"))`
                 );
                 resultTokenProvider = resultTokenProvider.replace(
-                    `public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parser()
-            .setSigningKey(key)
-            .parseClaimsJws(token)
-            .getBody();
-
-        Collection<? extends GrantedAuthority> roles =
+                    `Collection<? extends GrantedAuthority> roles =
             Arrays.stream(claims.get(ROLES_KEY).toString().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
         User principal = new User(claims.getSubject(), "", roles);
 
-        return new UsernamePasswordAuthenticationToken(principal, token, roles);
-    }`,
-                    `public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parser()
-            .setSigningKey(key)
-            .parseClaimsJws(token)
-            .getBody();
-
-        Set<String> roles = Arrays.stream(claims.get(ROLES_KEY).toString().split(",")).collect(Collectors.toSet());
+        return new UsernamePasswordAuthenticationToken(principal, token, roles);`,
+                    `Set<String> roles = Arrays.stream(claims.get(ROLES_KEY).toString().split(",")).collect(Collectors.toSet());
         Set<String> authorities;
         if (roles.contains(AuthoritiesConstants.ADMIN)) {
             authorities = AuthoritiesConstants.AUTHORITIES_TREE.keySet();
@@ -340,28 +314,9 @@ import org.slf4j.Logger;`
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());
         User principal = new User(claims.getSubject(), "", rolesAndAuthorties);
-        return new UsernamePasswordAuthenticationToken(principal, token, rolesAndAuthorties);
-    }`
+        return new UsernamePasswordAuthenticationToken(principal, token, rolesAndAuthorties);`
                 );
                 this.fs.write(tokenProviderFileName, resultTokenProvider);
-
-                /* ************ .h2.server.properties ************ */
-                const h2ServerFileName = `${SERVER_MAIN_RES_DIR}.h2.server.properties`;
-                let resultH2Server = this.fs.read(h2ServerFileName);
-                resultH2Server = resultH2Server.replace(
-                    `#H2 Server Properties
-0=JHipster H2 (Disk)|org.h2.Driver|jdbc\\:h2\\:file\\:./target/h2db/db/jhipsterblueprint|jhipsterBlueprint
-webAllowOthers=true
-webPort=8082
-webSSL=false`,
-                    `#H2 Server Properties
-#Sun Jun 21 18:05:12 BST 2020
-0=JHipster H2 (Disk)|org.h2.Driver|jdbc\\:h2\\:file\\:./build/h2db/db/preauthorize|preauthorize
-webSSL=false
-webAllowOthers=true
-webPort=8082`
-                );
-                this.fs.write(h2ServerFileName, resultH2Server);
 
                 /* ************ 00000000000000_initial_schema.xml ************ */
                 const initialSchemaFileName = `${SERVER_MAIN_RES_DIR}config/liquibase/changelog/00000000000000_initial_schema.xml`;
@@ -392,18 +347,25 @@ webPort=8082`
                 );
                 this.fs.write(initialSchemaFileName, resultInitialSchema);
 
-                /* ************ JWTFilterTest.java ************ */
+                /* ************ JWTFilterIT.java ************ */
                 const jwtFilterTestFileName = `${SERVER_TEST_SRC_DIR}${this.packageFolder}/security/jwt/JWTFilterTest.java`;
                 let resultJwtFilterTest = this.fs.read(jwtFilterTestFileName);
                 resultJwtFilterTest = resultJwtFilterTest.replace(
+                    'public class JWTFilterTest {',
+                    `@SpringBootTest(classes = ${this.mainClass}.class)
+public class JWTFilterIT {`
+                );
+                resultJwtFilterTest = resultJwtFilterTest.replace(
                     `import ${this.packageName}.security.AuthoritiesConstants;`,
-                    `import ${this.packageName}.repository.RoleAuthorityRepository;
+                    `import ${this.packageName}.${this.mainClass};
+import ${this.packageName}.repository.RoleAuthorityRepository;
 import ${this.packageName}.security.AuthoritiesConstants;`
                 );
                 resultJwtFilterTest = resultJwtFilterTest.replace(
                     'import org.junit.jupiter.api.Test;',
                     `import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;`
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;`
                 );
                 resultJwtFilterTest = resultJwtFilterTest.replace(
                     'private JWTFilter jwtFilter;',
@@ -416,7 +378,10 @@ import org.springframework.beans.factory.annotation.Autowired;`
                     'tokenProvider = new TokenProvider(jHipsterProperties)',
                     'tokenProvider = new TokenProvider(jHipsterProperties, roleAuthorityRepository)'
                 );
-                this.fs.write(jwtFilterTestFileName, resultJwtFilterTest);
+                // this.fs.write(jwtFilterTestFileName, resultJwtFilterTest);
+                const newName = `${SERVER_TEST_SRC_DIR}${this.packageFolder}/security/jwt/JWTFilterIT.java`;
+                this.fs.write(newName, resultJwtFilterTest);
+                this.fs.delete(jwtFilterTestFileName);
 
                 /* ************ TokenProviderTest.java ************ */
                 const tokenProviderTestFileName = `${SERVER_TEST_SRC_DIR}${this.packageFolder}/security/jwt/TokenProviderTest.java`;
@@ -444,13 +409,7 @@ import org.springframework.beans.factory.annotation.Autowired;`
                 );
                 this.fs.write(tokenProviderTestFileName, resultTokenProviderTest);
 
-                /* ************ UserMapperTest.java ************ */
-                const userMapperFileName = `${SERVER_TEST_SRC_DIR}${this.packageFolder}/service/mapper/UserMapperTest.java`;
-                let resultUserMapper = this.fs.read(userMapperFileName);
-                resultUserMapper = resultUserMapper.replace(/getAuthorities/g, 'getRoles');
-                this.fs.write(userMapperFileName, resultUserMapper);
-
-                /* ************ AccountResourceIT.java ************ */
+                /* ************ AccountResourceIT.java  replace back ************ */
                 const accountResourceITFileName = `${SERVER_TEST_SRC_DIR}${this.packageFolder}/web/rest/AccountResourceIT.java`;
                 let resultAccountResourceIT = this.fs.read(accountResourceITFileName);
                 resultAccountResourceIT = resultAccountResourceIT.replace(/getRoles/g, 'getAuthorities');
@@ -464,73 +423,14 @@ import org.springframework.beans.factory.annotation.Autowired;`
                     'assertThat(updatedUser.getAuthorities()).isEmpty();',
                     'assertThat(updatedUser.getRoles()).isEmpty();'
                 );
-                resultAccountResourceIT = resultAccountResourceIT.replace(/JhipsterBlueprintApp/g, 'PreauthorizeApp');
                 this.fs.write(accountResourceITFileName, resultAccountResourceIT);
 
-                /* ************ UserResourceIT.java ************ */
+                /* ************ UserResourceIT.java replace back ************ */
                 const userResourceITFileName = `${SERVER_TEST_SRC_DIR}${this.packageFolder}/web/rest/UserResourceIT.java`;
                 let resultUserResourceIT = this.fs.read(userResourceITFileName);
-                resultUserResourceIT = resultUserResourceIT.replace(/getAuthorities/g, 'getRoles');
-                resultUserResourceIT = resultUserResourceIT.replace(/setAuthorities/g, 'setRoles');
-                resultUserResourceIT = resultUserResourceIT.replace(/JhipsterBlueprintApp/g, 'PreauthorizeApp');
-                resultUserResourceIT = resultUserResourceIT.replace(/.domain.Authority;/g, '.domain.Role;');
-                resultUserResourceIT = resultUserResourceIT.replace(/getAllAuthorities/g, 'getAllRoles');
-                resultUserResourceIT = resultUserResourceIT.replace(/\/api\/users\/authorities/g, '/api/users/roles');
                 resultUserResourceIT = resultUserResourceIT.replace(
-                    `Set<Authority> authorities = new HashSet<>();
-        Authority authority = new Authority();
-        authority.setName(AuthoritiesConstants.USER);
-        authorities.add(authority);
-        user.setRoles(authorities);`,
-                    `Set<Role> roles = new HashSet<>();
-        Role role = new Role();
-        role.setName(AuthoritiesConstants.USER);
-        roles.add(role);
-        user.setRoles(roles);`
-                );
-                resultUserResourceIT = resultUserResourceIT.replace(
-                    `public void testAuthorityEquals() {
-        Authority authorityA = new Authority();
-        assertThat(authorityA).isEqualTo(authorityA);
-        assertThat(authorityA).isNotEqualTo(null);
-        assertThat(authorityA).isNotEqualTo(new Object());
-        assertThat(authorityA.hashCode()).isEqualTo(0);
-        assertThat(authorityA.toString()).isNotNull();
-
-        Authority authorityB = new Authority();
-        assertThat(authorityA).isEqualTo(authorityB);
-
-        authorityB.setName(AuthoritiesConstants.ADMIN);
-        assertThat(authorityA).isNotEqualTo(authorityB);
-
-        authorityA.setName(AuthoritiesConstants.USER);
-        assertThat(authorityA).isNotEqualTo(authorityB);
-
-        authorityB.setName(AuthoritiesConstants.USER);
-        assertThat(authorityA).isEqualTo(authorityB);
-        assertThat(authorityA.hashCode()).isEqualTo(authorityB.hashCode());
-    }`,
-                    `public void testRoleEquals() {
-        Role roleA = new Role();
-        assertThat(roleA).isEqualTo(roleA);
-        assertThat(roleA).isNotEqualTo(null);
-        assertThat(roleA).isNotEqualTo(new Object());
-        assertThat(roleA.hashCode()).isEqualTo(0);
-        assertThat(roleA.toString()).isNotNull();
-
-        Role roleB = new Role();
-        assertThat(roleB).isEqualTo(roleB);
-
-        roleB.setName(AuthoritiesConstants.ADMIN);
-        assertThat(roleA).isNotEqualTo(roleB);
-
-        roleA.setName(AuthoritiesConstants.USER);
-        assertThat(roleA).isNotEqualTo(roleB);
-
-        roleB.setName(AuthoritiesConstants.USER);
-        assertThat(roleA).isEqualTo(roleB);
-        assertThat(roleA.hashCode()).isEqualTo(roleB.hashCode());
-    }`
+                    '@WithMockUser(roles = AuthoritiesConstants.ADMIN)',
+                    '@WithMockUser(authorities = AuthoritiesConstants.ADMIN)'
                 );
                 this.fs.write(userResourceITFileName, resultUserResourceIT);
             }

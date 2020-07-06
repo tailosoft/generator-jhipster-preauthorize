@@ -7,8 +7,6 @@ import <%= packageName %>.domain.User;
 import <%= packageName %>.repository.RoleAuthorityRepository;
 import <%= packageName %>.security.AuthoritiesConstants;
 import <%= packageName %>.security.SecurityUtils;
-import <%= packageName %>.service.dto.RoleAuthorityDTO;
-import <%= packageName %>.service.mapper.RoleAuthorityMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -31,13 +29,10 @@ public class RoleAuthorityService {
 
     private final RoleAuthorityRepository roleAuthorityRepository;
 
-    private final RoleAuthorityMapper roleAuthorityMapper;
-
     private final UserService userService;
 
-    public RoleAuthorityService(RoleAuthorityRepository roleAuthorityRepository, RoleAuthorityMapper roleAuthorityMapper, UserService userService) {
+    public RoleAuthorityService(RoleAuthorityRepository roleAuthorityRepository, UserService userService) {
         this.roleAuthorityRepository = roleAuthorityRepository;
-        this.roleAuthorityMapper = roleAuthorityMapper;
         this.userService = userService;
     }
 
@@ -70,10 +65,10 @@ public class RoleAuthorityService {
             .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().stream().filter(a -> currentUserAuthorities.contains(a)).collect(Collectors.toList())));
     }
 
-    public List<RoleAuthorityDTO> findByRoleName(String roleName) {
+    public Set<String> findByRoleName(String roleName) {
         Set<String> currentUserAuthorities = SecurityUtils.getCurrentAuthorities();
-        List<RoleAuthority> roleAuthorities = roleAuthorityRepository.findByRoleName(roleName)
-            .stream().filter(ra -> currentUserAuthorities.contains(ra.getAuthority())).collect(Collectors.toList());
-        return roleAuthorityMapper.toDto(roleAuthorities);
+        Set<String> roleAuthorities = roleAuthorityRepository.findDistinctByRoleName(roleName);
+        roleAuthorities.retainAll(currentUserAuthorities);
+        return roleAuthorities;
     }
 }

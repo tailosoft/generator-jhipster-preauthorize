@@ -19,6 +19,7 @@
 const constants = require('generator-jhipster/generators/generator-constants');
 
 const SERVER_MAIN_SRC_DIR = constants.SERVER_MAIN_SRC_DIR;
+const SERVER_TEST_SRC_DIR = constants.SERVER_TEST_SRC_DIR;
 // const SERVER_TEST_SRC_DIR = constants.SERVER_TEST_SRC_DIR;
 
 /**
@@ -41,56 +42,46 @@ const serverFiles = {
                     renameTo: generator => `${generator.javaDir}repository/RoleAuthorityRepository.java`
                 },
                 {
-                    file: 'package/service/dto/RoleAuthorityDTO.java',
-                    renameTo: generator => `${generator.javaDir}service/dto/RoleAuthorityDTO.java`
-                },
-                {
-                    file: 'package/service/mapper/RoleAuthorityMapper.java',
-                    renameTo: generator => `${generator.javaDir}service/mapper/RoleAuthorityMapper.java`
-                },
-                {
                     file: 'package/service/RoleAuthorityService.java',
                     renameTo: generator => `${generator.javaDir}service/RoleAuthorityService.java`
                 },
                 {
                     file: 'package/web/rest/RoleAuthorityResource.java',
                     renameTo: generator => `${generator.javaDir}web/rest/RoleAuthorityResource.java`
+                },
+                {
+                    file: 'package/service/RoleService.java',
+                    renameTo: generator => `${generator.javaDir}service/RoleService.java`
+                },
+                {
+                    file: 'package/web/rest/RoleResource.java',
+                    renameTo: generator => `${generator.javaDir}web/rest/RoleResource.java`
                 }
             ]
-            // },
-            // {
-            //     condition: generator => generator.authenticationType === 'oauth2' && generator.databaseType !== 'no',
-            //     path: SERVER_TEST_SRC_DIR,
-            //     templates: [
-            //         {
-            //             file: 'package/service/mapper/UserMapperTest.java',
-            //             renameTo: generator => `${generator.testDir}service/mapper/UserMapperTest.java`,
-            //         },
-            //         {
-            //             file: 'package/web/rest/UserResourceIT.java',
-            //             renameTo: generator => `${generator.testDir}web/rest/UserResourceIT.java`,
-            //         }
-            //     ]
-            // },
-            // {
-            //     path: SERVER_TEST_SRC_DIR,
-            //     templates: [
-            //         {
-            //             file: 'package/web/rest/AccountResourceIT.java',
-            //             renameTo: generator => `${generator.testDir}web/rest/AccountResourceIT.java`,
-            //         }
-            //     ]
+        },
+        {
+            condition: generator => generator.databaseType !== 'no',
+            path: SERVER_TEST_SRC_DIR,
+            templates: [
+                {
+                    file: 'package/domain/RoleAuthorityTest.java',
+                    renameTo: generator => `${generator.testDir}domain/RoleAuthorityTest.java`
+                },
+                {
+                    file: 'package/web/rest/RoleAuthorityResourceIT.java',
+                    renameTo: generator => `${generator.testDir}web/rest/RoleAuthorityResourceIT.java`
+                },
+                {
+                    file: 'package/web/rest/RoleResourceIT.java',
+                    renameTo: generator => `${generator.testDir}web/rest/RoleResourceIT.java`
+                }
+            ]
         }
     ]
 };
 
 function writeFiles() {
     return {
-        // setUp() {
-        //     this.javaDir = `${this.packageFolder}/`;
-        //     this.testDir = `${this.packageFolder}/`;
-        // },
-
         writeRoleAuthorityServerFiles() {
             if (this.skipServer) return;
 

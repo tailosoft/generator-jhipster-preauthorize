@@ -43,6 +43,11 @@ describe('Subgenerator entity-server of preauthorize JHipster blueprint', () => 
                         require('../generators/entity-server/index.js'), // eslint-disable-line global-require
                         'jhipster-preauthorize:entity-server',
                         path.join(__dirname, '../generators/entity-server/index.js')
+                    ],
+                    [
+                        require('../generators/client/index.js'), // eslint-disable-line global-require
+                        'jhipster-preauthorize:client',
+                        path.join(__dirname, '../generators/client/index.js')
                     ]
                 ])
                 .on('end', done);

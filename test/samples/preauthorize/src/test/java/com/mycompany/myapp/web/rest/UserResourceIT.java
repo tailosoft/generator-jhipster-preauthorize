@@ -565,7 +565,7 @@ public class UserResourceIT {
         assertThat(roleA.toString()).isNotNull();
 
         Role roleB = new Role();
-        assertThat(roleB).isEqualTo(roleB);
+        assertThat(roleA).isEqualTo(roleB);
 
         roleB.setName(AuthoritiesConstants.ADMIN);
         assertThat(roleA).isNotEqualTo(roleB);

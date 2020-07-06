@@ -66,10 +66,10 @@ public class UserMapperTest {
     }
 
     @Test
-    public void userDTOsToUsersWithAuthoritiesStringShouldMapToUsersWithAuthoritiesDomain() {
-        Set<String> authoritiesAsString = new HashSet<>();
-        authoritiesAsString.add("ADMIN");
-        userDto.setAuthorities(authoritiesAsString);
+    public void userDTOsToUsersWithRolesStringShouldMapToUsersWithRolesDomain() {
+        Set<String> rolesAsString = new HashSet<>();
+        rolesAsString.add("ADMIN");
+        userDto.setRoles(rolesAsString);
 
         List<UserDTO> usersDto = new ArrayList<>();
         usersDto.add(userDto);
@@ -84,8 +84,8 @@ public class UserMapperTest {
     }
 
     @Test
-    public void userDTOsToUsersMapWithNullAuthoritiesStringShouldReturnUserWithEmptyAuthorities() {
-        userDto.setAuthorities(null);
+    public void userDTOsToUsersMapWithNullRolesStringShouldReturnUserWithEmptyRoles() {
+        userDto.setRoles(null);
 
         List<UserDTO> usersDto = new ArrayList<>();
         usersDto.add(userDto);
@@ -99,10 +99,10 @@ public class UserMapperTest {
     }
 
     @Test
-    public void userDTOToUserMapWithAuthoritiesStringShouldReturnUserWithAuthorities() {
-        Set<String> authoritiesAsString = new HashSet<>();
-        authoritiesAsString.add("ADMIN");
-        userDto.setAuthorities(authoritiesAsString);
+    public void userDTOToUserMapWithRolesStringShouldReturnUserWithRoles() {
+        Set<String> rolesAsString = new HashSet<>();
+        rolesAsString.add("ADMIN");
+        userDto.setRoles(rolesAsString);
 
         User user = userMapper.userDTOToUser(userDto);
 
@@ -113,8 +113,8 @@ public class UserMapperTest {
     }
 
     @Test
-    public void userDTOToUserMapWithNullAuthoritiesStringShouldReturnUserWithEmptyAuthorities() {
-        userDto.setAuthorities(null);
+    public void userDTOToUserMapWithNullRolesStringShouldReturnUserWithEmptyRoles() {
+        userDto.setRoles(null);
 
         User user = userMapper.userDTOToUser(userDto);
 

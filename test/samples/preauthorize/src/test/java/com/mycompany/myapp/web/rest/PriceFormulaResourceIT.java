@@ -3,7 +3,6 @@ package com.mycompany.myapp.web.rest;
 import com.mycompany.myapp.PreauthorizeApp;
 import com.mycompany.myapp.domain.PriceFormula;
 import com.mycompany.myapp.repository.PriceFormulaRepository;
-import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.PriceFormulaService;
 import com.mycompany.myapp.service.dto.PriceFormulaDTO;
 import com.mycompany.myapp.service.mapper.PriceFormulaMapper;
@@ -20,9 +19,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
-import com.mycompany.myapp.security.AuthoritiesConstants.*;
 import java.util.List;
 
+import static com.mycompany.myapp.security.AuthoritiesConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -34,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = PreauthorizeApp.class)
 
 @AutoConfigureMockMvc
-@WithMockUser
 public class PriceFormulaResourceIT {
 
     private static final Integer DEFAULT_MAX = 1;
@@ -96,7 +94,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_CREATE )
+    @WithMockUser(authorities = {PRICE_FORMULA_CREATE})
     public void createPriceFormula() throws Exception {
         int databaseSizeBeforeCreate = priceFormulaRepository.findAll().size();
 
@@ -117,7 +115,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_CREATE )
+    @WithMockUser(authorities = {PRICE_FORMULA_CREATE})
     public void createPriceFormulaWithExistingId() throws Exception {
         int databaseSizeBeforeCreate = priceFormulaRepository.findAll().size();
 
@@ -136,8 +134,10 @@ public class PriceFormulaResourceIT {
         assertThat(priceFormulaList).hasSize(databaseSizeBeforeCreate);
     }
 
+
     @Test
     @Transactional
+    @WithMockUser(authorities = {PRICE_FORMULA_CREATE})
     public void checkMaxIsRequired() throws Exception {
         int databaseSizeBeforeTest = priceFormulaRepository.findAll().size();
         // set the field null
@@ -157,6 +157,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(authorities = {PRICE_FORMULA_CREATE})
     public void checkFormulaIsRequired() throws Exception {
         int databaseSizeBeforeTest = priceFormulaRepository.findAll().size();
         // set the field null
@@ -176,7 +177,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulas() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -189,10 +190,10 @@ public class PriceFormulaResourceIT {
             .andExpect(jsonPath("$.[*].max").value(hasItem(DEFAULT_MAX)))
             .andExpect(jsonPath("$.[*].formula").value(hasItem(DEFAULT_FORMULA)));
     }
-
+    
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getPriceFormula() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -206,9 +207,10 @@ public class PriceFormulaResourceIT {
             .andExpect(jsonPath("$.formula").value(DEFAULT_FORMULA));
     }
 
+
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getPriceFormulasByIdFiltering() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -225,9 +227,10 @@ public class PriceFormulaResourceIT {
         defaultPriceFormulaShouldNotBeFound("id.lessThan=" + id);
     }
 
+
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulasByMaxIsEqualToSomething() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -241,7 +244,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulasByMaxIsNotEqualToSomething() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -255,7 +258,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulasByMaxIsInShouldWork() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -269,7 +272,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulasByMaxIsNullOrNotNull() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -283,7 +286,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulasByMaxIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -297,7 +300,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulasByMaxIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -311,7 +314,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulasByMaxIsLessThanSomething() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -325,7 +328,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulasByMaxIsGreaterThanSomething() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -337,9 +340,10 @@ public class PriceFormulaResourceIT {
         defaultPriceFormulaShouldBeFound("max.greaterThan=" + SMALLER_MAX);
     }
 
+
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulasByFormulaIsEqualToSomething() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -353,7 +357,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulasByFormulaIsNotEqualToSomething() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -367,7 +371,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulasByFormulaIsInShouldWork() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -381,7 +385,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulasByFormulaIsNullOrNotNull() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -392,10 +396,9 @@ public class PriceFormulaResourceIT {
         // Get all the priceFormulaList where formula is null
         defaultPriceFormulaShouldNotBeFound("formula.specified=false");
     }
-
-    @Test
+                @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulasByFormulaContainsSomething() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -409,7 +412,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getAllPriceFormulasByFormulaNotContainsSomething() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -456,9 +459,10 @@ public class PriceFormulaResourceIT {
             .andExpect(content().string("0"));
     }
 
+
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_READ )
+    @WithMockUser(authorities = {PRICE_FORMULA_READ})
     public void getNonExistingPriceFormula() throws Exception {
         // Get the priceFormula
         restPriceFormulaMockMvc.perform(get("/api/price-formulas/{id}", Long.MAX_VALUE))
@@ -467,7 +471,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_UPDATE )
+    @WithMockUser(authorities = {PRICE_FORMULA_UPDATE})
     public void updatePriceFormula() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);
@@ -498,7 +502,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_UPDATE )
+    @WithMockUser(authorities = {PRICE_FORMULA_UPDATE})
     public void updateNonExistingPriceFormula() throws Exception {
         int databaseSizeBeforeUpdate = priceFormulaRepository.findAll().size();
 
@@ -518,7 +522,7 @@ public class PriceFormulaResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(authorities = AuthoritiesConstants.PRICE_FORMULA_DELETE )
+    @WithMockUser(authorities = {PRICE_FORMULA_DELETE})
     public void deletePriceFormula() throws Exception {
         // Initialize the database
         priceFormulaRepository.saveAndFlush(priceFormula);

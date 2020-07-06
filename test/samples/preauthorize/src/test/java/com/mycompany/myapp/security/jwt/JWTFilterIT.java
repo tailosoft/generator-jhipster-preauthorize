@@ -1,5 +1,6 @@
 package com.mycompany.myapp.security.jwt;
 
+import com.mycompany.myapp.PreauthorizeApp;
 import com.mycompany.myapp.repository.RoleAuthorityRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import io.github.jhipster.config.JHipsterProperties;
@@ -9,6 +10,7 @@ import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -22,7 +24,8 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class JWTFilterTest {
+@SpringBootTest(classes = PreauthorizeApp.class)
+public class JWTFilterIT {
 
     private TokenProvider tokenProvider;
 

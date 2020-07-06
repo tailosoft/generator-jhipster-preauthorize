@@ -1,7 +1,10 @@
 /* eslint-disable consistent-return */
 const chalk = require('chalk');
 const ClientGenerator = require('generator-jhipster/generators/client');
-const writeFiles = require('./files').writeFiles;
+const constants = require('generator-jhipster/generators/generator-constants');
+
+const ANGULAR_DIR = constants.ANGULAR_DIR;
+const CLIENT_TEST_SRC_DIR = constants.CLIENT_TEST_SRC_DIR;
 
 module.exports = class extends ClientGenerator {
     constructor(args, opts) {
@@ -94,8 +97,39 @@ module.exports = class extends ClientGenerator {
         // If the templates doesnt need to be overrriden then just return `super._writing()` here
         const phaseFromJHipster = super._writing();
         const customPhaseSteps = {
-            writeAdditionalFile() {
-                writeFiles.call(this);
+            preauthorizeClientReplaceAuthorityWithRole() {
+                const filesNames = [
+                    `${ANGULAR_DIR}admin/user-management/user-management-detail.component.html`,
+                    `${ANGULAR_DIR}admin/user-management/user-management-update.component.html`,
+                    `${ANGULAR_DIR}admin/user-management/user-management-update.component.ts`,
+                    `${ANGULAR_DIR}admin/user-management/user-management.component.html`,
+                    `${ANGULAR_DIR}core/user/user.service.ts`,
+                    `${CLIENT_TEST_SRC_DIR}spec/app/admin/user-management/user-management-update.component.spec.ts`,
+                    `${CLIENT_TEST_SRC_DIR}spec/app/core/user/user.service.spec.ts`,
+                    `${CLIENT_TEST_SRC_DIR}spec/app/admin/user-management/user-management-detail.component.spec.ts`
+                ];
+
+                filesNames.forEach(fileName => {
+                    if (this.fs.exists(fileName)) {
+                        const result = this._replaceAuthorityByRole(this.fs.read(fileName));
+                        this.fs.write(fileName, result);
+                    }
+                });
+
+                /* ****** user.model.ts ****** */
+                const userModelFileName = `${ANGULAR_DIR}core/user/user.model.ts`;
+                let resultUserModel = this.fs.read(userModelFileName);
+                resultUserModel = resultUserModel.replace(
+                    'authorities?: string[];',
+                    `roles?: string[];
+  authorities?: string[];`
+                );
+                resultUserModel = resultUserModel.replace(
+                    'public authorities?: string[],',
+                    `public roles?: string[],
+    public authorities?: string[],`
+                );
+                this.fs.write(userModelFileName, resultUserModel);
             }
         };
         return Object.assign(phaseFromJHipster, customPhaseSteps);
@@ -109,5 +143,21 @@ module.exports = class extends ClientGenerator {
     get end() {
         // Here we are not overriding this phase and hence its being handled by JHipster
         return super._end();
+    }
+
+    _replaceAuthorityByRole(data) {
+        data = data.replace(/Authority/g, 'Role');
+        data = data.replace(/authority/g, 'role');
+        data = data.replace(/Authorities/g, 'Roles');
+        data = data.replace(/authorities/g, 'roles');
+        data = data.replace(/Role.USER/g, 'Authority.USER');
+        data = data.replace(/Role.ADMIN/g, 'Authority.ADMIN');
+        data = data.replace(
+            "import { Role } from 'app/shared/constants/role.constants';",
+            "import { Authority } from 'app/shared/constants/authority.constants';"
+        );
+        // add fields to User constructor in tests
+        data = data.replace("[Authority.USER], 'admin'", "[Authority.USER], undefined, 'admin'");
+        return data;
     }
 };

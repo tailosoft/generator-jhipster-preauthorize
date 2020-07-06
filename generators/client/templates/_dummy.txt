@@ -1,2 +1,0 @@
-hello preauthorize!
-It's dummy.txt
