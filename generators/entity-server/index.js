@@ -73,10 +73,116 @@ module.exports = class extends EntityServerGenerator {
 
     get writing() {
         const customPostPhaseSteps = {
-            addPreAuthorizeAnnotationsAndAuthorities() {
-                const fileName = `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/web/rest/${this.entityClass}Resource.java`;
+            addPreAuthorizeAnnotationsAndImports() {
                 const entityNameUpperCase = _.snakeCase(this.name).toUpperCase();
-                this.fs.append(fileName, `// ${entityNameUpperCase}_DELETE`);
+                const fileName = `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/web/rest/${this.entityClass}Resource.java`;
+                let result = this.fs.read(fileName);
+                // add imports
+                result = result.replace(
+                    'import org.springframework.http.ResponseEntity;',
+                    `import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;`
+                );
+                result = result.replace(
+                    `/**
+ * REST controller`,
+                    `import static ${this.packageName}.security.AuthoritiesConstants.*;
+
+/**
+ * REST controller`
+                );
+                // add preAuthorize annotations
+                result = result.replace(
+                    /(@GetMapping.+)/g,
+                    `$1
+    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_READ + "')")`
+                );
+                result = result.replace(
+                    /(@DeleteMapping.+)/g,
+                    `$1
+    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_DELETE + "')")`
+                );
+                result = result.replace(
+                    /(@PostMapping.+)/g,
+                    `$1
+    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_CREATE + "')")`
+                );
+                result = result.replace(
+                    /(@PutMapping.+)/g,
+                    `$1
+    @PreAuthorize("hasAuthority('" + ${entityNameUpperCase}_UPDATE + "')")`
+                );
+                this.fs.write(fileName, result);
+
+                const fileNameIT = `src/test/java/${this.packageFolder}/web/rest/${this.entityClass}ResourceIT.java`;
+                let resultIT = this.fs.read(fileNameIT);
+                resultIT = resultIT.replace(
+                    `@WithMockUser
+public class ${this.entityClass}ResourceIT {`,
+                    `public class ${this.entityClass}ResourceIT {`
+                );
+                resultIT = resultIT.replace(
+                    'import static org.assertj.core.api.Assertions.assertThat;',
+                    `import static ${this.packageName}.security.AuthoritiesConstants.*;
+import static org.assertj.core.api.Assertions.assertThat;`
+                );
+                resultIT = resultIT.replace(
+                    /(public void create.+)/g,
+                    `@WithMockUser(authorities = {${entityNameUpperCase}_CREATE})
+    $1`
+                );
+                resultIT = resultIT.replace(
+                    /(public void check.+)/g,
+                    `@WithMockUser(authorities = {${entityNameUpperCase}_CREATE})
+    $1`
+                );
+                resultIT = resultIT.replace(
+                    /(public void get.+)/g,
+                    `@WithMockUser(authorities = {${entityNameUpperCase}_READ})
+    $1`
+                );
+                resultIT = resultIT.replace(
+                    /(public void delete.+)/g,
+                    `@WithMockUser(authorities = {${entityNameUpperCase}_DELETE})
+    $1`
+                );
+                resultIT = resultIT.replace(
+                    /(public void update.+)/g,
+                    `@WithMockUser(authorities = {${entityNameUpperCase}_UPDATE})
+    $1`
+                );
+                this.fs.write(fileNameIT, resultIT);
+            },
+
+            addAuthoritiesConstant() {
+                const fileName = `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/security/AuthoritiesConstants.java`;
+                let result = this.fs.read(fileName);
+                const entityNameUpperCase = _.snakeCase(this.name).toUpperCase();
+                const entityKebabCase = _.kebabCase(this.name);
+                const treeInit = `
+        new AbstractMap.SimpleEntry<>(${entityNameUpperCase}_CREATE, new ArrayList<String>()),
+        new AbstractMap.SimpleEntry<>(${entityNameUpperCase}_READ, new ArrayList<String>()),
+        new AbstractMap.SimpleEntry<>(${entityNameUpperCase}_UPDATE, new ArrayList<String>()),
+        new AbstractMap.SimpleEntry<>(${entityNameUpperCase}_DELETE, new ArrayList<String>())`;
+                result = result.replace(
+                    `)
+    ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));`,
+                    `),
+${treeInit}
+    ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));`
+                );
+                const authorities = `public static final String ${entityNameUpperCase}_CREATE = "${entityKebabCase}+create";
+    public static final String ${entityNameUpperCase}_READ = "${entityKebabCase}+read";
+    public static final String ${entityNameUpperCase}_UPDATE = "${entityKebabCase}+update";
+    public static final String ${entityNameUpperCase}_DELETE = "${entityKebabCase}+delete";
+`;
+                result = result.replace(
+                    'public static final Map<String, List<String>> AUTHORITIES_TREE = Stream.of(',
+                    `${authorities}
+    public static final Map<String, List<String>> AUTHORITIES_TREE = Stream.of(`
+                );
+
+                this.fs.write(fileName, result);
             }
         };
         // TODO check if another EntityServerGenerator Blueprint exist to know if we should return only our custom function or prepend it with super._writing();
