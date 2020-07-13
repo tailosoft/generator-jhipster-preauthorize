@@ -185,14 +185,6 @@ ${treeInit}
                 this.fs.write(fileName, result);
             }
         };
-        // TODO check if another EntityServerGenerator Blueprint exist to know if we should return only our custom function or prepend it with super._writing();
-        const otherBlueprintPresent = false;
-        if (!otherBlueprintPresent) {
-            return {
-                ...super._writing(),
-                ...customPostPhaseSteps
-            };
-        }
         return customPostPhaseSteps;
     }
 

@@ -1,5 +1,6 @@
 package com.mycompany.myapp.security.jwt;
 
+import com.mycompany.myapp.PreauthorizeApp;
 import com.mycompany.myapp.repository.RoleAuthorityRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 
@@ -9,6 +10,7 @@ import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,7 +25,8 @@ import io.jsonwebtoken.security.Keys;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TokenProviderTest {
+@SpringBootTest(classes = PreauthorizeApp.class)
+public class TokenProviderIT {
 
     private static final long ONE_MINUTE = 60000;
 
@@ -35,7 +38,7 @@ public class TokenProviderTest {
 
     @BeforeEach
     public void setup() {
-        tokenProvider = new TokenProvider( new JHipsterProperties(), roleAuthorityRepository);
+        tokenProvider = new TokenProvider(new JHipsterProperties(), roleAuthorityRepository);
         key = Keys.hmacShaKeyFor(Decoders.BASE64
             .decode("fd54a45s65fds737b9aafcb3412e07ed99b267f33413274720ddbb7f6c5e64e9f14075f2d7ed041592f0b7657baf8"));
 

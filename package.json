@@ -29,7 +29,7 @@
   "devDependencies": {
     "chai": "4.1.2",
     "ejs-lint": "0.3.0",
-    "eslint": "5.0.0",
+    "eslint": "^5.0.0",
     "eslint-config-airbnb-base": "13.0.0",
     "eslint-config-prettier": "3.1.0",
     "eslint-plugin-import": "2.12.0",
@@ -38,7 +38,6 @@
     "jsdoc": "3.5.5",
     "mocha": "5.2.0",
     "prettier": "1.14.3",
-    "rimraf": "3.0.2",
     "sinon": "6.0.0",
     "yeoman-assert": "3.1.1",
     "yeoman-test": "1.7.2"
@@ -48,7 +47,7 @@
     "lint-fix": "npm run lint -- --fix",
     "pretest": "npm run lint",
     "test": "npm run test:unit -- test/*.spec.js",
-    "test:unit": "mocha --timeout 20000 --slow 0 --reporter spec",
+    "test:unit": "mocha --timeout 60000 --slow 0 --reporter spec",
     "jsdoc": "jsdoc --configure jsdoc-conf.json",
     "release": "git push && git push --tags && npm publish",
     "release:patch": "npm version patch -a -m \"Update to %s\" && npm run release",

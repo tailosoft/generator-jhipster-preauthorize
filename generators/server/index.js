@@ -82,17 +82,13 @@ module.exports = class extends ServerGenerator {
 
     get writing() {
         const customPostPhaseSteps = {
-            writeRoleAuthorityServerFiles() {
-                // override the writeServerFiles method from the _writing phase of JHipster
-                writeFiles().writeRoleAuthorityServerFiles.call(this);
-            },
+            ...writeFiles(),
             changeAuthorityToRole() {
                 const filesNames = [
                     `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/domain/User.java`,
                     `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/domain/Authority.java`,
                     `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/web/rest/UserResource.java`,
                     `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/repository/UserRepository.java`,
-                    // `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/security/jwt/TokenProvider.java`,
                     `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/security/DomainUserDetailsService.java`,
                     `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/service/mapper/UserMapper.java`,
                     `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/service/UserService.java`,
@@ -128,7 +124,7 @@ module.exports = class extends ServerGenerator {
                 );
                 this.fs.write(fileNameCacheConfig, resultCacheConfig);
 
-                /* ************ AuthorityConstants.java ************ */
+                /* ************ AuthoritiesConstants.java ************ */
                 const fileNameAuthoritiesConstants = `${SERVER_MAIN_SRC_DIR}${this.packageFolder}/security/AuthoritiesConstants.java`;
                 let resultAuthoritiesConstants = this.fs.read(fileNameAuthoritiesConstants);
                 resultAuthoritiesConstants = resultAuthoritiesConstants.replace(
@@ -388,13 +384,15 @@ import org.springframework.boot.test.context.SpringBootTest;`
                 let resultTokenProviderTest = this.fs.read(tokenProviderTestFileName);
                 resultTokenProviderTest = resultTokenProviderTest.replace(
                     `import ${this.packageName}.security.AuthoritiesConstants;`,
-                    `import ${this.packageName}.repository.RoleAuthorityRepository;
+                    `import ${this.packageName}.${this.mainClass};
+import ${this.packageName}.repository.RoleAuthorityRepository;
 import ${this.packageName}.security.AuthoritiesConstants;`
                 );
                 resultTokenProviderTest = resultTokenProviderTest.replace(
                     'import org.junit.jupiter.api.Test;',
                     `import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;`
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;`
                 );
                 resultTokenProviderTest = resultTokenProviderTest.replace(
                     'private TokenProvider tokenProvider;',
@@ -405,9 +403,15 @@ import org.springframework.beans.factory.annotation.Autowired;`
                 );
                 resultTokenProviderTest = resultTokenProviderTest.replace(
                     'tokenProvider = new TokenProvider( new JHipsterProperties());',
-                    'tokenProvider = new TokenProvider( new JHipsterProperties(), roleAuthorityRepository);'
+                    'tokenProvider = new TokenProvider(new JHipsterProperties(), roleAuthorityRepository);'
                 );
-                this.fs.write(tokenProviderTestFileName, resultTokenProviderTest);
+                resultTokenProviderTest = resultTokenProviderTest.replace(
+                    'public class TokenProviderTest {',
+                    `@SpringBootTest(classes = ${this.mainClass}.class)
+public class TokenProviderIT {`
+                );
+                this.fs.write(tokenProviderTestFileName.replace('Test', 'IT'), resultTokenProviderTest);
+                this.fs.delete(tokenProviderTestFileName);
 
                 /* ************ AccountResourceIT.java  replace back ************ */
                 const accountResourceITFileName = `${SERVER_TEST_SRC_DIR}${this.packageFolder}/web/rest/AccountResourceIT.java`;
@@ -435,15 +439,6 @@ import org.springframework.beans.factory.annotation.Autowired;`
                 this.fs.write(userResourceITFileName, resultUserResourceIT);
             }
         };
-        // Here we are not overriding this phase and hence its being handled by JHipster
-        // TODO check if another EntityServerGenerator Blueprint exist to know if we should return only our custom function or prepend it with super._writing();
-        const otherBlueprintPresent = false;
-        if (!otherBlueprintPresent) {
-            return {
-                ...super._writing(),
-                ...customPostPhaseSteps
-            };
-        }
         return customPostPhaseSteps;
     }
 

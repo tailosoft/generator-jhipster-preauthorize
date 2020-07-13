@@ -76,7 +76,7 @@ module.exports = class extends ClientGenerator {
         //         this.configOptions.useSass = this.useSass;
         //     }
         // };
-        // If the prompts need to be overriden then use the code commented out above instead
+        // If the prompts need to be overridden then use the code commented out above instead
 
         // Here we are not overriding this phase and hence its being handled by JHipster
         return super._prompting();
@@ -93,9 +93,6 @@ module.exports = class extends ClientGenerator {
     }
 
     get writing() {
-        // The writing phase is being overriden so that we can write our own templates as well.
-        // If the templates doesnt need to be overrriden then just return `super._writing()` here
-        const phaseFromJHipster = super._writing();
         const customPhaseSteps = {
             preauthorizeClientReplaceAuthorityWithRole() {
                 const filesNames = [
@@ -132,7 +129,7 @@ module.exports = class extends ClientGenerator {
                 this.fs.write(userModelFileName, resultUserModel);
             }
         };
-        return Object.assign(phaseFromJHipster, customPhaseSteps);
+        return customPhaseSteps;
     }
 
     get install() {

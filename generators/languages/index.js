@@ -72,8 +72,7 @@ module.exports = class extends LanguagesGenerator {
     }
 
     get writing() {
-        // Here we are not overriding this phase and hence its being handled by JHipster
-        return super._writing();
+        return {};
     }
 
     get install() {

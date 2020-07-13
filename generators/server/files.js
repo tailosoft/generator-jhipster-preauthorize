@@ -82,6 +82,10 @@ const serverFiles = {
 
 function writeFiles() {
     return {
+        setUp() {
+            this.javaDir = `${this.packageFolder}/`;
+            this.testDir = `${this.packageFolder}/`;
+        },
         writeRoleAuthorityServerFiles() {
             if (this.skipServer) return;
 
