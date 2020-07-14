@@ -1,6 +1,6 @@
 {
   "name": "generator-jhipster-preauthorize",
-  "version": "0.0.0",
+  "version": "6.8.1",
   "description": "Adds PreAuthorize to each endpoint for each entity",
   "keywords": [
     "yeoman-generator",
