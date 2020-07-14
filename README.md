@@ -17,6 +17,13 @@ We now have a relationship UserRole and manage it through the UserResource endpo
 In the case of AccountResource, and only in that case, we would like to return the users (Fine Grained) Authorities with its roles, for an easier code we added back the field authorities to the UserDTO (only), and it is always empty except in that case.
 (If you have a better proposition please create an Issue and PR).
 
+## Quirks
+The code would be much cleaner if we could detect foreach subgenerator, if a previous blueprint will overwrite a specific step (in our case the writing step).  
+We would be able to return only custom steps in that case or prepend with super steps.  
+Since we cannot detect that, out custom steps have as a first step, one that checks if an expect file is present and call what the main generator should have called before mving to the next ones.
+
+In case the detection prooves to be really impossible in the future, we could make our code a bit cleaner by iterating over the steps in automatically `super._writing(). foreachMethode` instead of calling them manually: `super._writing().write...` 
+
 # Prerequisites
 
 As this is a [JHipster](https://www.jhipster.tech/) blueprint, we expect you have JHipster and its related tools already installed:
@@ -100,60 +107,12 @@ jhipster -d --blueprint preauthorize
 ```
 
 #Contributing and debugging
-When coding the generator, sometimes break points could help a lot, but our tests use import-jdl that uses muti-threading and make them hard to debug with breakpoints.
-Please contact as if you really need this.
+To bel able to run tests locally, make sure install globally the blueprints:
+- generator-jhipster-default
+- generator-jhipster-primeng-blueprint
+- generator-jhipster-composite-key-server
 
-Our internal workaround is to add the following spec file in /test/temp/server-debugger-helper.spec.js and run it with a debugger. It is much easier.
-```
-const path = require('path');
-const assert = require('yeoman-assert');
-const helpers = require('yeoman-test');
-
-describe('Subgenerator server of preauthorize JHipster blueprint', () => {
-    describe('Sample test', () => {
-        before(done => {
-            helpers
-                .run('generator-jhipster/generators/server')
-                .withOptions({
-                    'from-cli': true,
-                    skipInstall: true,
-                    blueprint: 'preauthorize',
-                    skipChecks: true
-                })
-                .withGenerators([
-                    [
-                        require('../../generators/server'), // eslint-disable-line global-require
-                        'jhipster-preauthorize:server',
-                        path.join(__dirname, '../generators/server/index.js')
-                    ]
-                ])
-                .withPrompts({
-                    baseName: 'sampleMysql',
-                    packageName: 'com.mycompany.myapp',
-                    applicationType: 'monolith',
-                    databaseType: 'sql',
-                    devDatabaseType: 'h2Disk',
-                    prodDatabaseType: 'mysql',
-                    cacheProvider: 'ehcache',
-                    authenticationType: 'session',
-                    enableTranslation: true,
-                    nativeLanguage: 'en',
-                    languages: ['fr', 'de'],
-                    buildTool: 'maven',
-                    rememberMeKey: '2bb60a80889aa6e6767e9ccd8714982681152aa5'
-                })
-                .on('end', done);
-        });
-
-        it('it works', () => {
-            assert.textEqual('This should fail!', 'This should never be comited or fixed!');
-        });
-    });
-});
-
-```
-
-You can have a similar one for testing the other generators (entity-server...), check the branch generator-upstream for their content
+with **versions** matching the current version of the blueprint 
 
 # License
 
