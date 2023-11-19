@@ -1,10 +1,10 @@
 {
-  "generator-jhipster-blueprint": {
-    "promptValues": {
-      "githubName": "elhoutico",
-      "authorName": "Youssef El Houti",
-      "authorEmail": "youssef.elhouti@elhouti.com",
-      "authorUrl": "https://elhouti.com"
+    "generator-jhipster-blueprint": {
+        "promptValues": {
+            "githubName": "tailosoft",
+            "authorName": "Youssef El Houti",
+            "authorEmail": "youssef.elhouti@tailosoft.com",
+            "authorUrl": "https://tailosoft.com"
+        }
     }
-  }
 }

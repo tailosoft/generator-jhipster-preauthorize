@@ -7,11 +7,11 @@
     "jhipster-blueprint",
     "jhipster-5"
   ],
-  "homepage": "https://github.com/elhoutico/generator-jhipster-preauthorize",
+  "homepage": "https://github.com/tailosoft/generator-jhipster-preauthorize",
   "author": {
     "name": "Youssef El Houti",
-    "email": "youssef.elhouti@elhouti.com",
-    "url": "https://elhouti.com"
+    "email": "youssef.elhouti@tailosoft.com",
+    "url": "https://tailosoft.com"
   },
   "files": [
     "generators"
@@ -19,7 +19,7 @@
   "main": "generators/app/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/elhoutico/generator-jhipster-preauthorize.git"
+    "url": "git+https://github.com/tailosoft/generator-jhipster-preauthorize.git"
   },
   "dependencies": {
     "chalk": "2.4.1",
@@ -56,6 +56,6 @@
   },
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/elhoutico/generator-jhipster-preauthorize/issues"
+    "url": "https://github.com/tailosoft/generator-jhipster-preauthorize/issues"
   }
 }
