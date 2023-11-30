@@ -2,6 +2,7 @@ package <%= packageName %>.service.dto;
 
 import <%= packageName %>.security.AuthoritiesConstants;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -14,6 +15,7 @@ public class RoleDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @NotNull
     @Size(max = 50)
     @Pattern(regexp = AuthoritiesConstants.ROLE_REGEX)
     private String name;

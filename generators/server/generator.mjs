@@ -81,18 +81,19 @@ export default class extends ServerGenerator {
 
         /* ************ UserResource.java ************ */
         const fileNameUserResource = `${SERVER_MAIN_SRC_DIR}${packageFolder}/web/rest/UserResource.java`;
-        let resultUserResource = this.fs.read(fileNameUserResource);
-        resultUserResource = resultUserResource.replace(
-          'getUserWithAuthoritiesByLogin',
-          'getUserWithRolesByLogin'
-        );
-        this.fs.write(fileNameUserResource, resultUserResource);
+        if (this.fs.exists(fileNameUserResource)) {
+          let resultUserResource = this.fs.read(fileNameUserResource);
+          resultUserResource = resultUserResource.replace(
+            'getUserWithAuthoritiesByLogin',
+            'getUserWithRolesByLogin'
+          );
+          this.fs.write(fileNameUserResource, resultUserResource);
 
-        /* ************ PublicUserResource.java ************ */
-        const fileNamePublicUserResource = `${SERVER_MAIN_SRC_DIR}${packageFolder}/web/rest/PublicUserResource.java`;
-        let resultPublicUserResource = this.fs.read(fileNamePublicUserResource);
-        resultPublicUserResource = resultPublicUserResource.replace(
-          `
+          /* ************ PublicUserResource.java ************ */
+          const fileNamePublicUserResource = `${SERVER_MAIN_SRC_DIR}${packageFolder}/web/rest/PublicUserResource.java`;
+          let resultPublicUserResource = this.fs.read(fileNamePublicUserResource);
+          resultPublicUserResource = resultPublicUserResource.replace(
+            `
 
     /**
      * Gets a list of all roles.
@@ -102,9 +103,10 @@ export default class extends ServerGenerator {
     public List<String> getRoles() {
         return userService.getRoles();
     }`,
-          ''
-        );
-        this.fs.write(fileNamePublicUserResource, resultPublicUserResource);
+            ''
+          );
+          this.fs.write(fileNamePublicUserResource, resultPublicUserResource);
+        }
 
         /* ************ PublicUserResourceIT.java ************ */
         const fileNamePublicUserResourceIT = `${SERVER_TEST_SRC_DIR}${packageFolder}/web/rest/PublicUserResourceIT.java`;
