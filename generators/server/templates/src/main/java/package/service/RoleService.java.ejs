@@ -1,17 +1,21 @@
 package <%= packageName %>.service;
 
+import <%= packageName %>.security.AuthoritiesConstants;
 import <%= packageName %>.domain.Role;
 import <%= packageName %>.repository.RoleRepository;
+import <%= packageName %>.service.dto.RoleDTO;
+import <%= packageName %>.service.mapper.RoleMapper;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-
 /**
- * Service Implementation for managing {@link Role}.
+ * Service class for managing {@link Role}.
  */
 @Service
 @Transactional
@@ -21,51 +25,74 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
 
-    public RoleService(RoleRepository roleRepository) {
+    private final RoleMapper roleMapper;
+
+    public RoleService(RoleRepository roleRepository, RoleMapper roleMapper) {
         this.roleRepository = roleRepository;
+        this.roleMapper = roleMapper;
     }
 
     /**
      * Save a role.
      *
-     * @param role the entity to save.
+     * @param roleDTO the entity to save.
      * @return the persisted entity.
      */
-    public Role save(Role role) {
-        log.debug("Request to save Role : {}", role);
-        return roleRepository.save(role);
+    public RoleDTO save(RoleDTO roleDTO) {
+        log.debug("Request to save Role : {}", roleDTO);
+        Role role = roleMapper.toEntity(roleDTO);
+        role = roleRepository.save(role);
+        return roleMapper.toDto(role);
     }
 
     /**
-     * Get all the roles.
-     *
-     * @return the list of entities.
+     * @param roleDTO
+     * @return the roleDTO with updated permissions
      */
-    @Transactional(readOnly = true)
-    public List<Role> findAll() {
-        log.debug("Request to get all Roles");
-        return roleRepository.findAll();
+    public RoleDTO update(RoleDTO roleDTO) {
+        log.debug("Request to update Role : {}", roleDTO);
+        if (roleDTO.getName().equals(AuthoritiesConstants.ADMIN)) {
+            throw new IllegalArgumentException("can't update ROLE_ADMIN");
+        }
+        Role role = roleMapper.toEntity(roleDTO);
+        role = roleRepository.save(role);
+        return roleMapper.toDto(role);
     }
 
     /**
-     * Get one role by id.
+     * Get one role by name.
      *
-     * @param id the id of the entity.
+     * @param name the name of the entity.
      * @return the entity.
      */
     @Transactional(readOnly = true)
-    public Optional<Role> findOne(String id) {
-        log.debug("Request to get Role : {}", id);
-        return roleRepository.findById(id);
+    public Optional<RoleDTO> findOne(String name) {
+        log.debug("Request to get Role : {}", name);
+        return roleRepository.findById(name).map(roleMapper::toDto);
     }
 
     /**
-     * Delete the role by id.
+     * Delete the role by name.
      *
-     * @param id the id of the entity.
+     * @param name the name of the entity.
      */
-    public void delete(String id) {
-        log.debug("Request to delete Role : {}", id);
-        roleRepository.deleteById(id);
+    public void delete(String name) {
+        log.debug("Request to delete Role : {}", name);
+        if (name.equals(AuthoritiesConstants.ADMIN)) {
+            throw new IllegalArgumentException("can't delete ROLE_ADMIN");
+        }
+        roleRepository.deleteUserRolesByRoleName(name);
+        // normally one would want to clear the user cache in order of delete roles not to be included, but that is not a big deal as delete roles do not add extra permissions
+        roleRepository.deleteById(name);
+    }
+
+    /**
+     * Gets a list of all the roles.
+     *
+     * @return a list of all the roles.
+     */
+    @Transactional(readOnly = true)
+    public List<RoleDTO> findAll() {
+        return roleRepository.findAll().stream().map(roleMapper::toDto).collect(Collectors.toList());
     }
 }

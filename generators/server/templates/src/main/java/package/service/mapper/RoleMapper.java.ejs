@@ -1,0 +1,58 @@
+package <%= packageName %>.service.mapper;
+
+import <%= packageName %>.domain.Role;
+import <%= packageName %>.domain.RolePermission;
+import <%= packageName %>.domain.RolePermissionId;
+import <%= packageName %>.service.dto.RoleDTO;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.NotImplementedException;
+import org.mapstruct.Mapper;
+
+/**
+ * Mapper for the entity {@link Role} and its DTO {@link RoleDTO}.
+ */
+@Mapper(componentModel = "spring")
+public interface RoleMapper extends EntityMapper<RoleDTO, Role> {
+    @Override
+    default RoleDTO toDto(Role role) {
+        if (role == null) {
+            return null;
+        }
+        RoleDTO roleDTO = new RoleDTO();
+        roleDTO.setName(role.getName());
+        roleDTO.setPermissions(role.getPermissions().stream().map(RolePermission::getPermission).collect(Collectors.toSet()));
+        return roleDTO;
+    }
+
+    @Override
+    default Role toEntity(RoleDTO roleDTO) {
+        if (roleDTO == null) {
+            return null;
+        }
+        Role role = new Role();
+        role.setName(roleDTO.getName());
+        role.setPermissions(
+            roleDTO
+                .getPermissions()
+                .stream()
+                .map(permission -> {
+                    RolePermissionId id = new RolePermissionId();
+                    id.setPermission(permission);
+                    id.setRoleName(roleDTO.getName());
+                    RolePermission rolePermission = new RolePermission();
+                    rolePermission.setId(id);
+                    rolePermission.setPermission(permission);
+                    rolePermission.setRole(role);
+                    return rolePermission;
+                })
+                .collect(Collectors.toSet())
+        );
+        return role;
+    }
+
+    @Override
+    default void partialUpdate(Role entity, RoleDTO dto) {
+        // not needed
+        throw new NotImplementedException();
+    }
+}

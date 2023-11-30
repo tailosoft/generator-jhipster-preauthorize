@@ -1,61 +1,60 @@
 {
   "name": "generator-jhipster-preauthorize",
-  "version": "6.8.2",
-  "description": "Adds PreAuthorize to each endpoint for each entity",
+  "version": "7.9.3",
+  "description": "Preauthorize Blueprint",
   "keywords": [
     "yeoman-generator",
     "jhipster-blueprint",
-    "jhipster-5"
+    "jhipster-7"
   ],
-  "homepage": "https://github.com/tailosoft/generator-jhipster-preauthorize",
-  "author": {
-    "name": "Youssef El Houti",
-    "email": "youssef.elhouti@tailosoft.com",
-    "url": "https://tailosoft.com"
+  "license": "UNLICENSED",
+  "imports": {
+    "#test-utils": "./test/utils.mjs"
   },
   "files": [
     "generators"
   ],
-  "main": "generators/app/index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/tailosoft/generator-jhipster-preauthorize.git"
-  },
-  "dependencies": {
-    "chalk": "2.4.1",
-    "generator-jhipster": "6.8.0",
-    "lodash": "^4.17.15"
-  },
-  "devDependencies": {
-    "chai": "4.1.2",
-    "ejs-lint": "0.3.0",
-    "eslint": "^5.0.0",
-    "eslint-config-airbnb-base": "13.0.0",
-    "eslint-config-prettier": "3.1.0",
-    "eslint-plugin-import": "2.12.0",
-    "eslint-plugin-prettier": "3.0.0",
-    "fs-extra": "6.0.1",
-    "jsdoc": "3.5.5",
-    "mocha": "5.2.0",
-    "prettier": "1.14.3",
-    "sinon": "6.0.0",
-    "yeoman-assert": "3.1.1",
-    "yeoman-test": "1.7.2"
-  },
   "scripts": {
+    "ejslint": "ejslint generators/**/*.ejs && ejslint generators/**/*.ejs -d '&'",
     "lint": "eslint .",
-    "lint-fix": "npm run lint -- --fix",
-    "pretest": "npm run lint",
-    "test": "npm run test:unit -- test/*.spec.js",
-    "test:unit": "mocha --timeout 60000 --slow 0 --reporter spec",
-    "jsdoc": "jsdoc --configure jsdoc-conf.json",
+    "lint-fix": "npm run ejslint && npm run lint -- --fix",
+    "mocha": "mocha generators --no-insight --forbid-only",
+    "prettier-format": "prettier --write \"{,**/}*.{md,json,yml,html,js,cjs,mjs,ts,tsx,css,scss,vue,java}\"",
+    "prettier:check": "prettier --check \"{,src/**/}*.{md,json,yml,html,js,ts,tsx,css,scss,vue,java}\"",
+    "prettier:format": "prettier --write \"{,src/**/}*.{md,json,yml,html,js,ts,tsx,css,scss,vue,java}\"",
+    "pretest": "npm run prettier-check && npm run lint",
+    "test": "npm run mocha --",
+    "update-snapshot": "npm run mocha -- --no-parallel --updateSnapshot",
     "release": "git push && git push --tags && npm publish",
     "release:patch": "npm version patch -a -m \"Update to %s\" && npm run release",
     "release:minor": "npm version minor -a -m \"Update to %s\" && npm run release",
     "release:major": "npm version major -a -m \"Update to %s\" && npm run release"
   },
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/tailosoft/generator-jhipster-preauthorize/issues"
-  }
+  "dependencies": {
+    "chalk": "4.1.2",
+    "generator-jhipster": "7.9.3",
+    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "ejs-lint": "1.2.2",
+    "eslint": "8.24.0",
+    "eslint-config-airbnb-base": "15.0.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-mocha": "10.1.0",
+    "eslint-plugin-prettier": "4.2.1",
+    "expect": "29.0.3",
+    "mocha": "10.0.0",
+    "mocha-expect-snapshot": "5.0.1",
+    "prettier": "2.7.1",
+    "prettier-plugin-java": "1.6.2",
+    "prettier-plugin-packagejson": "2.2.18"
+  },
+  "engines": {
+    "node": ">=16.13.0"
+  },
+  "cacheDirectories": [
+    "node_modules"
+  ]
 }

@@ -1,0 +1,25 @@
+package <%= packageName %>.repository;
+
+import <%= packageName %>.domain.Role;
+import java.util.Collection;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+/**
+ * Spring Data JPA repository for the {@link Role} entity.
+ */
+
+@SuppressWarnings("unused")
+@Repository
+public interface RoleRepository extends JpaRepository<Role, String> {
+    @Modifying
+    @Query(value = "DELETE FROM jhi_user_role WHERE role_name=:roleName", nativeQuery = true)
+    void deleteUserRolesByRoleName(@Param("roleName") String roleName);
+
+    @Query(value = "SELECT DISTINCT rp.permission FROM jhi_role_permission rp WHERE rp.role_name IN :roleNames", nativeQuery = true)
+    List<String> findPermissionsByRoleNames(@Param("roleNames") Collection<String> roleNames);
+}

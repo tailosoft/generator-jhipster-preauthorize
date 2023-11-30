@@ -1,0 +1,47 @@
+package <%= packageName %>.service.dto;
+
+import <%= packageName %>.security.AuthoritiesConstants;
+
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.Set;
+
+/**
+ * A DTO representing a user, with his authorities.
+ */
+public class RoleDTO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Size(max = 50)
+    @Pattern(regexp = AuthoritiesConstants.ROLE_REGEX)
+    private String name;
+
+    private Set<String> permissions;
+
+    public RoleDTO() {
+        // Empty constructor needed for Jackson.
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<String> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Set<String> permissions) {
+        this.permissions = permissions;
+    }
+
+    @Override
+    public String toString() {
+        return "RoleDTO{" + "name='" + name + '\'' + ", permissions=" + permissions + '}';
+    }
+}

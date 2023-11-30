@@ -1,10 +1,22 @@
 {
-    "generator-jhipster-blueprint": {
-        "promptValues": {
-            "githubName": "tailosoft",
-            "authorName": "Youssef El Houti",
-            "authorEmail": "youssef.elhouti@tailosoft.com",
-            "authorUrl": "https://tailosoft.com"
-        }
-    }
+  "generator-jhipster": {
+    "additionalSubGenerators": "",
+    "baseName": "preauthorize",
+    "cli": false,
+    "entities": [],
+    "generators": {
+      "client": {
+        "command": false,
+        "priorities": ["writing"],
+        "sbs": true,
+        "written": true
+      }
+    },
+    "jhipsterVersion": "7.9.3",
+    "localBlueprint": false,
+    "prettierDefaultIndent": 2,
+    "projectName": "Preauthorize Blueprint",
+    "skipCommitHook": true,
+    "subGenerators": ["client"]
+  }
 }
