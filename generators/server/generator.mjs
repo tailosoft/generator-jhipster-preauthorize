@@ -39,11 +39,9 @@ export default class extends ServerGenerator {
           `${SERVER_MAIN_RES_DIR}config/liquibase/data/user_authority.csv`,
           `${SERVER_TEST_SRC_DIR}${packageFolder}/web/rest/AccountResourceIT.java`,
           `${SERVER_TEST_SRC_DIR}${packageFolder}/web/rest/UserResourceIT.java`,
-          `${SERVER_TEST_SRC_DIR}${packageFolder}/service/mapper/UserMapperTest.java`
+          `${SERVER_TEST_SRC_DIR}${packageFolder}/service/mapper/UserMapperTest.java`,
+          `${SERVER_MAIN_RES_DIR}config/liquibase/changelog/00000000000000_initial_schema.xml`
         ];
-        if (!incrementalChangelog || recreateInitialChangelog) {
-          filesNames.push(`${SERVER_MAIN_RES_DIR}config/liquibase/changelog/00000000000000_initial_schema.xml`)
-        }
         filesNames.forEach(fileName => {
           if (this.fs.exists(fileName)) {
             const result = replaceAuthorityByRole(this.fs.read(fileName));
@@ -249,35 +247,31 @@ import java.io.Serializable;`
         this.fs.write(roleFileName, resultRole);
 
         /* ************ 00000000000000_initial_schema.xml ************ */
+        const initialSchemaFileName = `${SERVER_MAIN_RES_DIR}config/liquibase/changelog/00000000000000_initial_schema.xml`;
+        let resultInitialSchema = this.fs.read(initialSchemaFileName);
+        resultInitialSchema = resultInitialSchema.replace(
+          /(referencedTableName="jhi_user.+?\n)\s*?<loadData/,
+          `$1
 
-        if (!incrementalChangelog || recreateInitialChangelog) {
-          const initialSchemaFileName = `${SERVER_MAIN_RES_DIR}config/liquibase/changelog/00000000000000_initial_schema.xml`;
-          let resultInitialSchema = this.fs.read(initialSchemaFileName);
-          resultInitialSchema = resultInitialSchema.replace(
-            /(<addPrimaryKey.+)/,
-            `<createTable tableName="jhi_role_permission">
-            <column name="permission" type="varchar(255)">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="role_name" type="varchar(255)">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-        </createTable>
+      <createTable tableName="jhi_role_permission">
+          <column name="role_name" type="varchar(50)">
+              <constraints nullable="false"/>
+          </column>
+          <column name="permission" type="varchar(50)">
+              <constraints nullable="false"/>
+          </column>
+      </createTable>
 
-        $1`
-          );
-          resultInitialSchema = resultInitialSchema.replace(
-            /(<addNotNullConstraint.+)/,
-            `<addForeignKeyConstraint baseColumnNames="role_name"
-                                 baseTableName="jhi_role_permission"
-                                 constraintName="fk_role_permission_role_name"
-                                 referencedColumnNames="name"
-                                 referencedTableName="jhi_role"/>
+      <addPrimaryKey columnNames="role_name, permission" tableName="jhi_role_permission"/>
 
-        $1`
-          );
-          this.fs.write(initialSchemaFileName, resultInitialSchema);
-        }
+      <addForeignKeyConstraint baseColumnNames="role_name"
+                               baseTableName="jhi_role_permission"
+                               constraintName="fk_role_permission_role_name"
+                               referencedColumnNames="name"
+                               referencedTableName="jhi_role"/>
+
+      <loadData`);
+        this.fs.write(initialSchemaFileName, resultInitialSchema);
 
         /* ************ AccountResourceIT.java  replace back ************ */
         const accountResourceITFileName = `${SERVER_TEST_SRC_DIR}${packageFolder}/web/rest/AccountResourceIT.java`;

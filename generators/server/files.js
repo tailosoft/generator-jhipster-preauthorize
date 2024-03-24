@@ -34,6 +34,10 @@ const serverFiles = {
           renameTo: generator => `${generator.javaDir}domain/RolePermissionId.java`,
         },
         {
+          file: 'package/repository/RoleRepository.java',
+          renameTo: generator => `${generator.javaDir}repository/RoleRepository.java`,
+        },
+        {
           file: 'package/service/RoleService.java',
           renameTo: generator => `${generator.javaDir}service/RoleService.java`,
         },
