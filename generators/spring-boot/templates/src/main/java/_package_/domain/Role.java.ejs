@@ -1,0 +1,80 @@
+package <%= packageName %>.domain;
+
+import <%= packageName %>.security.AuthoritiesConstants;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+/**
+ * A Role used by Spring Security.
+ */
+@Entity
+@Table(name = "jhi_role")
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+public class Role implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @NotNull
+    @Size(max = 50)
+    @Id
+    @Column(length = 50)
+    @Pattern(regexp = AuthoritiesConstants.ROLE_REGEX)
+    private String name;
+
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    private Set<RolePermission> permissions = new HashSet<>();
+
+    public String getName() {
+        return name;
+    }
+
+    public Role name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<RolePermission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Set<RolePermission> permissions) {
+        this.permissions = permissions;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Role)) {
+            return false;
+        }
+        return Objects.equals(name, ((Role) o).name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "Role{" +
+            "name='" + name + '\'' +
+            "}";
+    }
+}

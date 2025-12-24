@@ -1,58 +1,66 @@
 {
   "name": "generator-jhipster-preauthorize",
-  "version": "7.9.5",
+  "version": "9.0.0",
   "description": "Preauthorize Blueprint",
   "keywords": [
     "yeoman-generator",
     "jhipster-blueprint",
-    "jhipster-7"
+    "jhipster-8"
   ],
   "license": "UNLICENSED",
+  "type": "module",
   "imports": {
     "#test-utils": "./test/utils.mjs"
   },
   "files": [
-    "generators"
+    "generators",
+    "!**/__*",
+    "!**/*.snap",
+    "!**/*.spec.?(c|m)js"
   ],
   "scripts": {
-    "ejslint": "ejslint generators/**/*.ejs && ejslint generators/**/*.ejs -d '&'",
+    "ejslint": "ejslint generators/**/*.ejs",
     "lint": "eslint .",
     "lint-fix": "npm run ejslint && npm run lint -- --fix",
     "mocha": "mocha generators --no-insight --forbid-only",
-    "prettier-format": "prettier --write \"{,**/}*.{md,json,yml,html,js,cjs,mjs,ts,tsx,css,scss,vue,java}\"",
+    "prepare": "husky",
+    "prettier-check": "prettier --check \"{,**/}*.{md,json,yml,html,cjs,mjs,js,cts,mts,ts,tsx,css,scss,vue,java}\"",
+    "prettier-format": "prettier --write \"{,**/}*.{md,json,yml,html,cjs,mjs,js,cts,mts,ts,tsx,css,scss,vue,java}\"",
     "prettier:check": "prettier --check \"{,src/**/}*.{md,json,yml,html,js,ts,tsx,css,scss,vue,java}\"",
     "prettier:format": "prettier --write \"{,src/**/}*.{md,json,yml,html,js,ts,tsx,css,scss,vue,java}\"",
-    "pretest": "npm run prettier-check && npm run lint",
-    "test": "npm run mocha --",
-    "update-snapshot": "npm run mocha -- --no-parallel --updateSnapshot",
     "release": "git push && git push --tags && npm publish",
-    "release:patch": "npm version patch -a -m \"Update to %s\" && npm run release",
+    "release:major": "npm version major -a -m \"Update to %s\" && npm run release",
     "release:minor": "npm version minor -a -m \"Update to %s\" && npm run release",
-    "release:major": "npm version major -a -m \"Update to %s\" && npm run release"
+    "release:patch": "npm version patch -a -m \"Update to %s\" && npm run release",
+    "pretest": "npm run prettier-check && npm run lint",
+    "test": "vitest run",
+    "update-snapshot": "vitest run --update",
+    "vitest": "vitest"
   },
   "dependencies": {
     "chalk": "4.1.2",
-    "generator-jhipster": "7.9.3",
+    "generator-jhipster": "9.0.0-beta.0",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "ejs-lint": "1.2.2",
-    "eslint": "8.24.0",
-    "eslint-config-airbnb-base": "15.0.0",
-    "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-import": "2.26.0",
-    "eslint-plugin-mocha": "10.1.0",
-    "eslint-plugin-prettier": "4.2.1",
-    "expect": "29.0.3",
-    "mocha": "10.0.0",
-    "mocha-expect-snapshot": "5.0.1",
-    "prettier": "2.7.1",
+    "ejs-lint": "2.0.1",
+    "eslint": "9.39.2",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.4",
+    "globals": "16.5.0",
+    "husky": "9.1.7",
+    "jiti": "2.6.1",
+    "lint-staged": "16.1.5",
+    "prettier": "3.7.4",
     "prettier-plugin-java": "1.6.2",
-    "prettier-plugin-packagejson": "2.2.18"
+    "prettier-plugin-packagejson": "2.5.20",
+    "vitest": "4.0.16",
+    "yeoman-test": ">=10"
   },
   "engines": {
-    "node": ">=16.13.0"
+    "generator-jhipster": "9.0.0-beta.0",
+    "node": "^20.18.3 || >=22.12.0"
   },
   "cacheDirectories": [
     "node_modules"

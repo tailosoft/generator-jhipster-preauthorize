@@ -5,18 +5,70 @@
     "cli": false,
     "entities": [],
     "generators": {
-      "client": {
+      "entity-server": {
         "command": false,
-        "priorities": ["writing"],
-        "sbs": true,
+        "priorities": [
+          "initializing",
+          "prompting",
+          "configuring",
+          "composing",
+          "composingComponent",
+          "bootstrapApplication",
+          "loading",
+          "preparing",
+          "configuringEachEntity",
+          "loadingEntities",
+          "preparingEachEntity",
+          "preparingEachEntityField",
+          "preparingEachEntityRelationship",
+          "postPreparingEachEntity",
+          "default",
+          "writing",
+          "writingEntities",
+          "postWriting",
+          "postWritingEntities",
+          "loadingTranslations",
+          "install",
+          "postInstall",
+          "end"
+        ],
+        "sbs": false,
+        "written": true
+      },
+      "server": {
+        "command": false,
+        "priorities": [
+          "initializing",
+          "prompting",
+          "configuring",
+          "composing",
+          "composingComponent",
+          "bootstrapApplication",
+          "loading",
+          "preparing",
+          "configuringEachEntity",
+          "loadingEntities",
+          "preparingEachEntity",
+          "preparingEachEntityField",
+          "preparingEachEntityRelationship",
+          "postPreparingEachEntity",
+          "default",
+          "writing",
+          "writingEntities",
+          "postWriting",
+          "postWritingEntities",
+          "loadingTranslations",
+          "install",
+          "postInstall",
+          "end"
+        ],
+        "sbs": false,
         "written": true
       }
     },
-    "jhipsterVersion": "7.9.3",
+    "jhipsterVersion": "9.0.0-beta.0",
     "localBlueprint": false,
-    "prettierDefaultIndent": 2,
-    "projectName": "Preauthorize Blueprint",
-    "skipCommitHook": true,
-    "subGenerators": ["client"]
+    "sampleWritten": true,
+    "subGenerators": ["server", "entity-server"]
   }
 }

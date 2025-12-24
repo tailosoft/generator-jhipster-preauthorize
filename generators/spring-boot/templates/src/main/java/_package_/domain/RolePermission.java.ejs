@@ -1,0 +1,83 @@
+package <%= packageName %>.domain;
+
+import <%= packageName %>.security.AuthoritiesConstants;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+/**
+ * A RolePermission.
+ */
+@Entity
+@Table(name = "jhi_role_permission")
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+public class RolePermission implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @EmbeddedId
+    private RolePermissionId id;
+
+    @ManyToOne(optional = false)
+    @NotNull
+    @JoinColumn(insertable = false, updatable = false)
+    @JsonIgnoreProperties(value = { "roles" }, allowSetters = true)
+    private Role role;
+
+    @Column(name = "permission", insertable = false, updatable = false)
+    private String permission;
+
+    public RolePermissionId getId() {
+        return id;
+    }
+
+    public void setId(RolePermissionId id) {
+        this.id = id;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public String getPermission() {
+        return permission;
+    }
+
+    public void setPermission(String permission) {
+        this.permission = permission;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof RolePermission)) {
+            return false;
+        }
+        return id != null && id.equals(((RolePermission) o).id);
+    }
+
+    @Override
+    public int hashCode() {
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "RolePermission{" + "role='" + role + '\'' + ", permission='" + permission + '\'' + '}';
+    }
+}

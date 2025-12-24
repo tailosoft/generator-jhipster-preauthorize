@@ -1,59 +1,57 @@
-# Preauthorize Blueprint
-> JHipster blueprint, Adds PreAuthorize to each end point for each entity
+# generator-jhipster-preauthorize
+
+> JHipster blueprint, preauthorize blueprint for JHipster
+
+[![NPM version][npm-image]][npm-url]
+[![Generator][github-generator-image]][github-generator-url]
+[![Samples][github-samples-image]][github-samples-url]
 
 # Introduction
 
 This is a [JHipster](https://www.jhipster.tech/) blueprint, that is meant to be used in a JHipster application.
 
-This Blueprint allows to use fine grained permissions foreach generated endpoint.
+# Prerequisites
 
-To be able to use fine grained permissions without assigning each permission/authority to a user we:
-1. Replace the "Old" Authority Class with a new Role Class
-2. Now that users have roles, we link their roles to the permissions, using a new Entity RolePermission
+As this is a [JHipster](https://www.jhipster.tech/) blueprint, we expect you have JHipster basic knowledge:
 
-# known quirks
+- [JHipster](https://www.jhipster.tech/)
 
-## Adding permissions to authentications
+# Installation
 
-Since there are many way to authenticate, we need to populate the fined grained permissions after authenticating.
-it seems like there a way to do this using Spring `RoleHierarchy` but for know this needs to be added manually after install depending on what authentication you are using.
-ex: in TokenProvider when using JWT
+To install or update this blueprint:
+
+```bash
+npm install -g generator-jhipster-preauthorize
 ```
-    public Authentication getAuthentication(String token) {
-        Claims claims = jwtParser.parseClaimsJws(token).getBody();
-
-        List<String> roles = Arrays.asList(claims.get(ROLES_KEY).toString().split(","));
-        Collection<String> permissions = roles.contains(AuthoritiesConstants.ADMIN) ?
-            AuthoritiesConstants.PERMISSION_TREE.keySet() :
-            roleRepository.findPermissionsByRoleNames(roles);
-
-        Collection<? extends GrantedAuthority> authorities = Stream.concat(
-                roles.stream(),
-                permissions.stream()
-            )
-            .map(SimpleGrantedAuthority::new)
-            .collect(Collectors.toList());
-
-        User principal = new User(claims.getSubject(), "", authorities);
-
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
-    }
-
-```
-
-# Technical choices
-We now have a relationship UserRole and manage it through the UserResource endpoint (the same way Jhipster does by default with UserAuthority).
-In the case of AccountResource, and only in that case, we would like to return the users (Fine Grained) Authorities with its roles, for an easier code we added back the field authorities to the UserDTO (only), and it is always empty except in that case.
-(If you have a better proposition please create an Issue and PR).
 
 # Usage
 
 To use this blueprint, run the below command
 
 ```bash
-jhipster --blueprints primeng-blueprint,preauthorize import-jdl jhipster.jh
+jhipster --blueprints preauthorize
 ```
 
-Fine-grained permission are added in the frontend using the primeng blueprint.
+You can look for updated preauthorize blueprint specific options by running
 
+```bash
+jhipster app --blueprints preauthorize --help
+```
 
+And looking for `(blueprint option: preauthorize)` like
+
+## Pre-release
+
+To use an unreleased version, install it using git.
+
+```bash
+npm install -g jhipster/generator-jhipster-preauthorize#main
+jhipster --blueprints preauthorize --skip-jhipster-dependencies
+```
+
+[npm-image]: https://img.shields.io/npm/v/generator-jhipster-preauthorize.svg
+[npm-url]: https://npmjs.org/package/generator-jhipster-preauthorize
+[github-generator-image]: https://github.com/jhipster/generator-jhipster-preauthorize/actions/workflows/generator.yml/badge.svg
+[github-generator-url]: https://github.com/jhipster/generator-jhipster-preauthorize/actions/workflows/generator.yml
+[github-samples-image]: https://github.com/jhipster/generator-jhipster-preauthorize/actions/workflows/samples.yml/badge.svg
+[github-samples-url]: https://github.com/jhipster/generator-jhipster-preauthorize/actions/workflows/samples.yml
